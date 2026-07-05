@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# 推送前强制走本地 CI (lint + 冒烟 + 构建)。失败即阻断 push。
+# 启用: git config core.hooksPath .githooks  (bootstrap 已自动设置)
+# 临时跳过: git push --no-verify
+set -euo pipefail
+echo "── pre-push: 走本地 CI ──"
+exec "$(git rev-parse --show-toplevel)/scripts/ci.sh"

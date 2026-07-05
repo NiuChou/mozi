@@ -1,0 +1,470 @@
+/* ════════════════════════════════════════════════════════════════════════
+   墨韵 · 宋韵科技设计系统 (Mò Yùn)
+   简约 + 宋代古典 + 科技感 —— 宣纸为底, 天青为骨, 朱砂为印, 界线为格, 等宽为数。
+   字三件套: 宋体衬线(身份) · 系统无衬线(正文) · 等宽(数据/科技)。
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* 字族 */
+  --font-serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* 节奏 */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --t: 200ms cubic-bezier(0.22, 0.61, 0.36, 1); /* 宋瓷般温润的入场曲线 */
+  --shadow-1: 0 1px 2px rgba(34, 30, 22, 0.05), 0 2px 8px rgba(34, 30, 22, 0.04);
+  --shadow-2: 0 6px 24px rgba(34, 30, 22, 0.10);
+
+  /* 品牌印泥红 —— 朱砂红家族的「logo 提亮档」, 仅用于品牌印, 主题无关(固定不随日/夜切换)。
+     与 UI 语义色 --cinnabar(#9e3b2e, 错误 / 封条 / 谓词)同族不同档, 有意区分。
+     单一事实源: 品牌印为内联 SVG(组件 Seal.tsx)直接引用这三个变量, 改色只此一处, 无独立资产、无双写。 */
+  --mz-yinni-bright: #ea4e32; /* 钤印中心 · 渐变起点 */
+  --mz-yinni:        #d6361f; /* 印身主色 · 描边印 */
+  --mz-yinni-deep:   #af2113; /* 钤印边缘 · 渐变终点 */
+}
+
+/* ── 宣纸 · 日间 ───────────────────────────────────────────────────────── */
+:root, :root[data-theme="light"] {
+  --paper: #f4efe5;        /* 背景 · 宣纸 */
+  --paper-2: #fbf8f1;      /* 面板 · 绢素 */
+  --paper-sink: #ece5d6;   /* 凹陷/悬停井 */
+  --ink: #232428;          /* 正文 · 松烟墨 (暖近黑) */
+  --ink-2: #5b574e;        /* 次级 · 黛 */
+  --ink-3: #8d887c;        /* 弱 · 远山 */
+  --line: #ddd4c2;         /* 界线 · 细 */
+  --line-2: #cabfa9;       /* 界线 · 重 */
+  --celadon-bright: #bdd1db; /* 天青 · 汝窑青瓷淡然色 (偏碧空, 淡) — 大色块 (气泡/发送键) */
+  --celadon: #46788a;        /* 天青 · 中深 — 边框/焦点环/数据条/光标 (保可见) */
+  --celadon-soft: #e1e9ee;   /* 天青 · 淡彩底 (chip/wash) */
+  --celadon-ink: #2c5261;    /* 天青 · 深 — 纸面文字 */
+  --on-celadon: #11323d;     /* 淡天青色块上的字 (深墨青) */
+  --cinnabar: #9e3b2e;     /* 朱砂 · 印 (身份/警示, 唯一暖点) */
+  --cinnabar-soft: #f3e3dd;
+  --gold: #9a7a32;         /* 赭金 · 稀疏高亮 */
+  --gold-soft: #efe6cd;
+  --on-accent: #f6f1e7;    /* 印/天青上的字 */
+  /* 宣纸质感: 纤维分形噪声 + 帘纹 + 云斑 (手工纸的不匀色调) */
+  --paper-cloud-a: rgba(124, 98, 50, 0.06);
+  --paper-cloud-b: rgba(74, 122, 110, 0.055);
+  --paper-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.16' intercept='0.78'/%3E%3CfeFuncG type='linear' slope='0.16' intercept='0.78'/%3E%3CfeFuncB type='linear' slope='0.16' intercept='0.78'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --paper-laid: repeating-linear-gradient(0deg, rgba(58, 46, 26, 0.05) 0 1px, transparent 1px 6px);
+  --grain-blend: multiply;
+  --grain-opacity: 0.85;
+  color-scheme: light;
+}
+
+/* ── 墨夜 · 夜间 ───────────────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --paper: #15171a;
+  --paper-2: #1c1f23;
+  --paper-sink: #101214;
+  --ink: #e9e3d5;
+  --ink-2: #a8a395;
+  --ink-3: #6e6a60;
+  --line: #2a2e33;
+  --line-2: #383d44;
+  --celadon-bright: #a8c5d3; /* 墨夜: 淡天青大色块 (偏碧空, 淡, 配深墨青字) */
+  --celadon: #8fbac9;        /* 墨夜: 指示色 (亮, 透于深底) */
+  --celadon-soft: #1d2a30;
+  --celadon-ink: #a6c6d2;
+  --on-celadon: #102e38;
+  --cinnabar: #cb5d4a;
+  --cinnabar-soft: #2c1d1a;
+  --gold: #c8a45a;
+  --gold-soft: #2a2416;
+  --on-accent: #f6f1e7;
+  /* 墨夜: 纤维转为微光 (screen 提亮深墨纸), 帘纹/云斑压暗 */
+  --paper-cloud-a: rgba(255, 255, 255, 0.022);
+  --paper-cloud-b: rgba(128, 177, 163, 0.03);
+  --paper-laid: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.016) 0 1px, transparent 1px 6px);
+  --grain-blend: screen;
+  --grain-opacity: 0.05;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  /* 云斑 —— 手工纸的不匀色调 (大尺度, 固定) */
+  background-image:
+    radial-gradient(135% 90% at 12% -5%, var(--paper-cloud-a), transparent 55%),
+    radial-gradient(120% 80% at 100% 105%, var(--paper-cloud-b), transparent 50%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  transition: background-color var(--t), color var(--t);
+}
+/* 宣纸纤维纹 + 帘纹 —— 铺满固定层, 居内容之下; 面板不透明故只透显于对话画布,
+   形成「宣纸画布 / 绢面板」材质对比。 */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: var(--paper-fiber), var(--paper-laid);
+  background-size: 220px 220px, 100% 6px;
+  background-repeat: repeat, repeat;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: var(--grain-blend);
+}
+
+button { font-family: inherit; cursor: pointer; }
+button:disabled { opacity: 0.45; cursor: default; }
+/* 数据/计量统一等宽 + 表格数字, 防跳动 —— 科技精度 */
+.mono, b, .model-tag, .kv span:last-child, .quota, .usage-card,
+.score-bar + *, .evt, .edge, .chip { font-variant-numeric: tabular-nums; }
+
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ── 顶栏 —— 绢素细界, 不喧宾 ───────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 22px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+  transition: background-color var(--t), border-color var(--t);
+}
+.brand-wrap { display: flex; align-items: center; gap: 12px; min-width: 0; }
+/* 朱砂印 —— 宋画落款之印章, 全局识别锚点。
+   v2 焕新: 正红「印泥」色 + 手作不规则印身(残边 / 手钤不匀), 寓意「打破墨守成规」——
+   成语「墨守成规」中即含「墨」, 故把规整方印破开, 即字面意义上的破规。
+   印身(印泥渐变 + 位移粗糙边)与「墨」字小篆内联于组件 Seal.tsx, 渲染为 svg.seal;
+   篆字轮廓提取自崇羲篆體 (中研院, CC BY-ND 3.0 TW), 见 public/FONTS_NOTICE.md。
+   配色 = 「印泥红」, 即朱砂红家族的 logo 提亮档(token: --mz-yinni-*), 与 UI 语义色
+   --cinnabar(#9e3b2e, 错误 / 封条 / 谓词)同族不同档, 有意区分。描边印 / 其他印泥元素请引用 --mz-yinni-*。 */
+.seal {
+  flex: none; display: inline-block;
+  width: 36px; height: 36px;
+  filter: drop-shadow(0 1px 1.5px rgba(34, 30, 22, 0.22)); /* 钤盖微浮 */
+  user-select: none;
+}
+.brand {
+  font-family: var(--font-serif);
+  font-size: 21px; font-weight: 700; letter-spacing: 3px; color: var(--ink);
+  line-height: 1.1; white-space: nowrap;
+}
+.brand-en {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 1px; color: var(--ink-3); margin-left: 8px; vertical-align: 2px;
+}
+.topbar .sub {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-3); letter-spacing: 0.3px; margin-top: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.topbar .spacer { flex: 1; }
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 11.5px; padding: 4px 11px; border-radius: 999px;
+  background: var(--paper); border: 1px solid var(--line); color: var(--ink-2);
+  white-space: nowrap; transition: border-color var(--t), color var(--t);
+}
+.badge.ok {
+  background: var(--celadon-soft); border-color: transparent; color: var(--celadon-ink);
+}
+/* 主题切换 —— 日/月, 科技小交互 */
+.theme-toggle {
+  display: inline-grid; place-items: center;
+  width: 34px; height: 34px; flex: none;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); color: var(--ink-2);
+  transition: var(--t);
+}
+.theme-toggle:hover { border-color: var(--celadon); color: var(--celadon); }
+.theme-toggle svg { width: 17px; height: 17px; }
+
+/* ── 三栏布局 ─────────────────────────────────────────────────────────── */
+.main { display: grid; grid-template-columns: 232px 1fr 372px; flex: 1; min-height: 0; }
+.sidebar, .inspector {
+  background: var(--paper-2); overflow-y: auto;
+  transition: background-color var(--t), border-color var(--t);
+}
+.sidebar { border-right: 1px solid var(--line); padding: 16px 14px; }
+.inspector { border-left: 1px solid var(--line); }
+.center { display: flex; flex-direction: column; min-height: 0; }
+
+/* 细滚动条, 不夺目 */
+.sidebar::-webkit-scrollbar, .inspector::-webkit-scrollbar, .messages::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb, .inspector::-webkit-scrollbar-thumb,
+.messages::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+/* ── 侧栏 ─────────────────────────────────────────────────────────────── */
+.side-h {
+  font-family: var(--font-mono);
+  font-size: 10.5px; color: var(--ink-3); margin: 18px 4px 8px;
+  text-transform: uppercase; letter-spacing: 1.5px;
+}
+.side-h:first-of-type, .newbtn + .side-h { margin-top: 16px; }
+.newbtn {
+  width: 100%; padding: 10px; border: 1px solid var(--celadon); border-radius: var(--r-md);
+  background: transparent; color: var(--celadon-ink); font-weight: 600; font-size: 13.5px;
+  transition: var(--t);
+}
+.newbtn:hover:not(:disabled) { background: var(--celadon-soft); }
+.sess {
+  position: relative; display: flex; align-items: center; gap: 6px;
+  padding: 9px 11px; border-radius: var(--r-sm);
+  font-size: 13px; color: var(--ink-2); cursor: pointer; margin-bottom: 2px;
+  transition: background var(--t), color var(--t);
+}
+.sess-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sess:hover { background: var(--paper-sink); color: var(--ink); }
+/* 选中 —— 朱砂书签签条 */
+.sess.active { background: var(--paper-sink); color: var(--ink); font-weight: 600; }
+.sess.active::before {
+  content: ""; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px;
+  background: var(--cinnabar); border-radius: 0 2px 2px 0;
+}
+/* ⋮ 操作按钮 —— 默认隐, 悬停/选中/聚焦内现 */
+.sess-kebab {
+  flex: none; width: 22px; height: 22px; padding: 0; border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--ink-3); font-size: 16px; line-height: 1;
+  opacity: 0; transition: opacity var(--t), background var(--t), color var(--t);
+}
+.sess:hover .sess-kebab, .sess.active .sess-kebab, .sess-kebab:focus-visible { opacity: 1; }
+.sess-kebab:hover { background: var(--line); color: var(--ink); }
+/* 操作菜单 —— 绢面浮层 */
+.sess-menu {
+  position: absolute; top: calc(100% - 2px); right: 6px; z-index: 30;
+  min-width: 104px; padding: 4px; display: flex; flex-direction: column;
+  background: var(--paper-2); border: 1px solid var(--line-2); border-radius: var(--r-md);
+  box-shadow: var(--shadow-2);
+}
+.sess-menu button {
+  text-align: left; padding: 7px 10px; border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--ink-2); font-size: 12.5px; white-space: nowrap;
+  transition: background var(--t), color var(--t);
+}
+.sess-menu button:hover { background: var(--paper-sink); color: var(--ink); }
+.sess-menu button.danger { color: var(--cinnabar); }
+.sess-menu button.danger:hover { background: var(--cinnabar-soft); }
+/* 内联重命名输入 */
+.sess-rename {
+  flex: 1; min-width: 0; padding: 2px 6px; font-size: 13px; font-family: inherit;
+  color: var(--ink); background: var(--paper); border: 1px solid var(--celadon); border-radius: var(--r-sm);
+  outline: none;
+}
+/* 已归档折叠开关 */
+.arch-toggle {
+  width: 100%; text-align: left; padding: 7px 11px; margin-top: 2px;
+  border: none; background: transparent; color: var(--ink-3);
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .3px;
+  border-radius: var(--r-sm); transition: background var(--t), color var(--t);
+}
+.arch-toggle:hover { background: var(--paper-sink); color: var(--ink-2); }
+.usage-card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: 12px; font-size: 12px; color: var(--ink-2);
+}
+.usage-card b { font-family: var(--font-mono); font-size: 18px; color: var(--ink); font-weight: 600; }
+
+/* ── 对话区 ───────────────────────────────────────────────────────────── */
+.messages { flex: 1; overflow-y: auto; padding: 28px 24px; }
+.msg { max-width: 760px; margin: 0 auto 22px; }
+.msg .who {
+  font-size: 12px; color: var(--ink-3); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 8px; font-family: var(--font-mono);
+}
+.bubble {
+  padding: 13px 16px; border-radius: var(--r-lg); white-space: pre-wrap;
+  line-height: 1.7; font-size: 14.5px;
+  transition: border-color var(--t);
+}
+.msg.user .bubble {
+  background: var(--celadon-bright); color: var(--on-celadon);
+  border-radius: var(--r-lg) var(--r-lg) var(--r-sm) var(--r-lg);
+}
+.msg.assistant .bubble {
+  background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--r-lg) var(--r-lg) var(--r-lg) var(--r-sm);
+  box-shadow: var(--shadow-1);
+}
+/* 选中助手气泡 —— 天青描边, 喂检查器 */
+.msg.assistant.selected .bubble { border-color: var(--celadon); box-shadow: 0 0 0 1px var(--celadon); }
+.msg.error .bubble { background: var(--cinnabar-soft); border: 1px solid var(--cinnabar); color: var(--cinnabar); }
+.msg .model-tag {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--celadon-ink);
+  background: var(--celadon-soft); padding: 1px 7px; border-radius: 999px; font-weight: 500;
+}
+.msg .model-tag.warn { color: var(--gold); background: var(--gold-soft); }
+
+/* markdown */
+.md { white-space: normal; }
+.md p { margin: 0 0 9px; }
+.md p:last-child { margin-bottom: 0; }
+.md h1, .md h2, .md h3 { margin: 14px 0 7px; color: var(--ink); line-height: 1.35; font-family: var(--font-serif); font-weight: 600; }
+.md h1 { font-size: 18px; } .md h2 { font-size: 16px; } .md h3 { font-size: 14.5px; }
+.md ul, .md ol { margin: 5px 0 9px; padding-left: 22px; }
+.md li { margin: 3px 0; }
+.md li::marker { color: var(--celadon); }
+.md strong { font-weight: 700; color: var(--ink); }
+.md code.inline {
+  background: var(--paper-sink); color: var(--cinnabar); padding: 1px 6px;
+  border-radius: 5px; font-family: var(--font-mono); font-size: 12.5px;
+}
+.md .codeblock { position: relative; margin: 10px 0; }
+.md .codeblock pre {
+  margin: 0; padding: 14px 16px; background: #1b1f26; color: #e6e1d4;
+  border-radius: var(--r-md); overflow-x: auto;
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.md .codeblock .copy-code {
+  position: absolute; top: 8px; right: 8px; padding: 3px 10px; font-size: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.18); border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.06); color: #cfcabd; font-family: var(--font-mono);
+  transition: var(--t);
+}
+.md .codeblock .copy-code:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
+
+/* 消息操作 */
+.msg-actions { display: flex; gap: 8px; margin-top: 8px; }
+.msg-action {
+  font-family: var(--font-mono); font-size: 11px; padding: 3px 11px;
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: transparent; color: var(--ink-3); transition: var(--t);
+}
+.msg-action:hover:not(:disabled) { border-color: var(--celadon); color: var(--celadon); }
+.cursor {
+  display: inline-block; width: 7px; height: 1.1em; vertical-align: -2px;
+  background: var(--celadon); animation: blink 1.05s steps(2) infinite;
+}
+@keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+.reconnecting { display: inline-block; margin-left: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--gold); }
+
+/* 推理模型「思考过程」折叠区 (doubao-seed 等): 思维链与正文分流, 弱化呈现不喧宾夺主。 */
+.reasoning {
+  margin: 0 0 8px; border-left: 2px solid var(--line-2); border-radius: 4px;
+  background: var(--paper-sink); padding: 4px 10px; transition: var(--t);
+}
+.reasoning > summary {
+  cursor: pointer; list-style: none; user-select: none;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .5px; color: var(--ink-3);
+}
+.reasoning > summary::-webkit-details-marker { display: none; }
+.reasoning > summary::before { content: "▸ "; color: var(--celadon); }
+.reasoning[open] > summary::before { content: "▾ "; }
+.reasoning-body {
+  margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line);
+  font-size: 12.5px; line-height: 1.65; color: var(--ink-2); white-space: pre-wrap; word-break: break-word;
+}
+
+.empty { text-align: center; color: var(--ink-3); margin-top: 14vh; padding: 0 24px; }
+.empty h2 { color: var(--ink); font-family: var(--font-serif); font-weight: 600; font-size: 24px; letter-spacing: 1px; }
+.empty p { max-width: 460px; margin: 10px auto 0; line-height: 1.7; font-size: 13.5px; }
+
+/* ── 写作区 ───────────────────────────────────────────────────────────── */
+.composer { border-top: 1px solid var(--line); padding: 14px 24px 18px; background: var(--paper-2); transition: background-color var(--t), border-color var(--t); }
+.controls { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-bottom: 10px; font-size: 12px; max-width: 760px; margin-left: auto; margin-right: auto; }
+.controls label { color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
+.controls select {
+  padding: 5px 9px; border: 1px solid var(--line); border-radius: var(--r-sm);
+  font-family: var(--font-mono); font-size: 12px; background: var(--paper); color: var(--ink);
+  transition: border-color var(--t);
+}
+.controls select:hover { border-color: var(--line-2); }
+.toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--ink-2); }
+.toggle input { cursor: pointer; accent-color: var(--celadon); }
+.composer .row { display: flex; gap: 12px; max-width: 760px; margin: 0 auto; }
+.composer textarea {
+  flex: 1; resize: none; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: var(--r-md); font-family: var(--font-sans); font-size: 14.5px;
+  min-height: 52px; background: var(--paper); color: var(--ink);
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.composer textarea::placeholder { color: var(--ink-3); }
+.composer textarea:focus { outline: none; border-color: var(--celadon); box-shadow: 0 0 0 3px var(--celadon-soft); }
+.sendbtn {
+  align-self: stretch; padding: 0 26px; border: none; border-radius: var(--r-md);
+  background: var(--celadon-bright); color: var(--on-celadon); font-weight: 600; font-size: 14px;
+  transition: var(--t);
+}
+.sendbtn:hover { filter: brightness(0.96); }
+
+/* 焦点环 —— 天青, 统一 */
+.sess:focus-visible, .tab:focus-visible, .msg-action:focus-visible, .newbtn:focus-visible,
+.sendbtn:focus-visible, .mini-btn:focus-visible, .theme-toggle:focus-visible,
+.toggle input:focus-visible, .controls select:focus-visible {
+  outline: 2px solid var(--celadon); outline-offset: 2px;
+}
+.sess[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+
+/* ── 检查器 (Agent 控制室) ────────────────────────────────────────────── */
+.tabs { display: flex; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--paper-2); z-index: 1; }
+.tab {
+  flex: 1; padding: 12px 4px; text-align: center; font-size: 12px; border: none;
+  background: none; color: var(--ink-3); border-bottom: 2px solid transparent;
+  transition: color var(--t), border-color var(--t);
+}
+.tab:hover { color: var(--ink-2); }
+.tab.active { color: var(--celadon-ink); font-weight: 600; border-bottom-color: var(--celadon); }
+.pane { padding: 16px; }
+.pane h3 {
+  font-family: var(--font-serif); font-size: 13.5px; font-weight: 600;
+  margin: 0 0 10px; color: var(--ink); display: flex; align-items: center; gap: 6px;
+}
+.kv { font-size: 12px; display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+.kv span:first-child { color: var(--ink-3); }
+.kv span:last-child { font-family: var(--font-mono); color: var(--ink); text-align: right; }
+.kv b { font-family: var(--font-mono); }
+.chip {
+  display: inline-block; font-family: var(--font-mono); font-size: 10.5px;
+  padding: 2px 9px; border-radius: 999px; background: var(--celadon-soft);
+  color: var(--celadon-ink); margin: 2px 4px 2px 0;
+}
+.chip.green { background: var(--celadon-soft); color: var(--celadon-ink); }
+.chip.amber { background: var(--gold-soft); color: var(--gold); }
+.card {
+  border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px;
+  margin-bottom: 9px; font-size: 12.5px; background: var(--paper);
+  transition: border-color var(--t);
+}
+.card .t { font-weight: 600; color: var(--ink); line-height: 1.5; }
+.card .src { color: var(--ink-3); font-size: 11px; margin-top: 5px; font-family: var(--font-mono); }
+.score-bar { height: 5px; background: var(--paper-sink); border-radius: 3px; overflow: hidden; margin-top: 3px; }
+.score-bar > div { height: 100%; background: var(--celadon); border-radius: 3px; transition: width var(--t); }
+.mini-input {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r-sm);
+  font-family: var(--font-sans); font-size: 12.5px; margin-bottom: 7px;
+  background: var(--paper); color: var(--ink); transition: border-color var(--t);
+}
+.mini-input:focus { outline: none; border-color: var(--celadon); box-shadow: 0 0 0 3px var(--celadon-soft); }
+.mini-btn {
+  padding: 7px 14px; border: 1px solid var(--celadon); border-radius: var(--r-sm);
+  background: transparent; color: var(--celadon-ink); font-size: 12px; font-weight: 600;
+  transition: var(--t);
+}
+.mini-btn:hover:not(:disabled) { background: var(--celadon-soft); }
+.evt { font-family: var(--font-mono); font-size: 11px; padding: 7px 0; border-bottom: 1px dashed var(--line); line-height: 1.5; }
+.evt b { color: var(--celadon-ink); }
+.muted { color: var(--ink-3); font-size: 12px; line-height: 1.6; }
+.edge { font-size: 12.5px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.edge b { font-weight: 600; }
+.edge .pred { color: var(--cinnabar); margin: 0 7px; font-family: var(--font-mono); font-size: 11px; }
+
+/* 配额条 */
+.quota { font-size: 11.5px; color: var(--ink-2); }
+.quota b { color: var(--celadon-ink); }
+.quota-bar { height: 5px; background: var(--paper-sink); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+.quota-bar > div { height: 100%; background: var(--celadon); border-radius: 3px; transition: width var(--t); }
+.quota.over b { color: var(--cinnabar); }
+.quota.over .quota-bar > div { background: var(--cinnabar); }
+.quota-warn { color: var(--cinnabar); margin-top: 5px; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+
+/* ── 无障碍: 尊重减弱动效 ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* ── 响应式: 窄屏折叠右栏 ─────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .main { grid-template-columns: 200px 1fr; }
+  .inspector { display: none; }
+}
+@media (max-width: 720px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .topbar .sub { display: none; }
+}

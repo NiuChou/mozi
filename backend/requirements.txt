@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27
+pydantic>=2.6
+ddgs>=9.0          # keyless 联网搜索后端 (web_search 工具); SearXNG 配 MOZI_SEARXNG_URL 时优先
+# PyJWT>=2.8       # 可选: auth JWT HS256 provider (锁 algorithms 防 alg=none); 缺失时降级纯 Python HMAC-v2 (同带 exp, 不破可运行)
+# stamina>=24.0    # 可选: adapter 重试退避底座; 缺失时 _resilient 降级纯 Python 退避 (零外呼/信创不破)
+# networkx        # 可选: KG N-hop 子图 (当前 query_kg 用 DB 侧分层 BFS, 不强依赖); 见 requirements-ml.txt
+# bandit / detect-secrets   # 可选: skill 装载前 AST/熵静态扫描; 缺失时 loader.static_scan 降级 _DANGER 正则
+# openai>=1.40   # 可选: 仅用 openai.types.chat 做 OpenAI 兼容 chunk schema 权威; 缺失降级手写 dict

@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>墨子 · 五表面 + 统一外壳 · 交互蓝图 Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ── 字三件套 (§D.2 · 信创离线优先, CDN 渐进增强) ── */
+  --font-serif:"Noto Serif SC","Songti SC","STSong","SimSun",Georgia,serif;
+  --font-sans:"Noto Sans SC","PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Inter",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  /* ════ 墨子原子色层 --mz-* (§C.7.1 · 主题无关的色彩事实) ════ */
+  /* 天青 Qing —— 骨 / 指示 */
+  --mz-qing-50:#eff5f7;--mz-qing-100:#e1e9ee;--mz-qing-200:#c7d9e0;--mz-qing-300:#a8c5d3;--mz-qing-400:#8fbac9;
+  --mz-qing-500:#6498a9;--mz-qing-600:#46788a;--mz-qing-700:#2c5261;--mz-qing-800:#1d3d49;--mz-qing-900:#11323d;--mz-qing-bright:#bdd1db;
+  /* 朱砂 Zhu —— UI 唯一暖色相 */
+  --mz-zhu-50:#f9ece7;--mz-zhu-100:#f3e3dd;--mz-zhu-200:#e8c3b8;--mz-zhu-300:#d99a89;--mz-zhu-400:#cb5d4a;
+  --mz-zhu-500:#b8493a;--mz-zhu-600:#9e3b2e;--mz-zhu-700:#823025;--mz-zhu-800:#5e241c;--mz-zhu-900:#2c1d1a;
+  /* 印泥红 Yinni —— 品牌印专用(朱砂提亮档), 仅 logo */
+  --mz-yinni-bright:#EA4E32;--mz-yinni:#D6361F;--mz-yinni-deep:#AF2113;
+  /* 赭金 Jin —— 限定高亮 / 警示 */
+  --mz-jin-50:#f7f1de;--mz-jin-100:#efe6cd;--mz-jin-200:#e2d0a3;--mz-jin-300:#d2b878;--mz-jin-400:#c8a45a;
+  --mz-jin-500:#b08e44;--mz-jin-600:#9a7a32;--mz-jin-700:#7c6228;--mz-jin-800:#54431b;--mz-jin-900:#2a2416;
+  /* 墨 Mo —— 暖中性(文字 / 界线) */
+  --mz-mo-50:#ece5d6;--mz-mo-100:#ddd4c2;--mz-mo-200:#cabfa9;--mz-mo-300:#a8a395;--mz-mo-400:#8d887c;
+  --mz-mo-500:#6e6a60;--mz-mo-600:#5b574e;--mz-mo-700:#34332f;--mz-mo-800:#232428;--mz-mo-900:#1a1b1e;
+  /* 宣纸 Xuan(日) / 墨夜 Night(夜) 面层 */
+  --mz-xuan-paper:#f4efe5;--mz-xuan-silk:#fbf8f1;--mz-xuan-sink:#ece5d6;
+  --mz-night-bg:#15171a;--mz-night-surface:#1c1f23;--mz-night-sink:#101214;--mz-night-line:#2a2e33;--mz-night-line2:#383d44;--mz-night-qing-soft:#1d2a30;
+  /* ════ 非色 token (§C.7.3 · 间距/圆角/阴影/层级/字号/动效) ════ */
+  --gap-1:4px;--gap-2:6px;--gap-3:8px;--gap-4:12px;--gap-5:16px;--gap-6:24px;--dense-row:28px;
+  --r-sm:6px;--r-md:10px;--r-lg:14px;
+  --t:200ms cubic-bezier(.22,.61,.36,1);
+  --shadow-1:0 1px 2px rgba(34,30,22,.05),0 2px 8px rgba(34,30,22,.04);
+  --shadow-2:0 6px 24px rgba(34,30,22,.12);
+  --shell-z-rail:30;--shell-z-topbar:50;--shell-z-overlay:100;--shell-z-toast:120;
+  --rail-w:56px;--statusbar-h:30px;
+  --fs-display:26px;--fs-h1:21px;--fs-h2:17px;--fs-h3:14.5px;--fs-body:14.5px;--fs-sm:13px;--fs-label:12px;--fs-meta:11px;--fs-micro:10.5px;
+  --lh-title:1.32;--lh-body:1.72;--lh-dense:1.5;--ls-brand:3px;--ls-label:.3px;
+  /* 宣纸纤维 + 帘纹 + 云纹 材质 (§F) */
+  --cloud-a:rgba(124,98,50,.06);--cloud-b:rgba(74,122,110,.055);
+  --laid:repeating-linear-gradient(0deg,rgba(58,46,26,.05) 0 1px,transparent 1px 6px);
+  --grain-blend:multiply;--grain-opacity:.85;
+}
+:root,:root[data-theme="light"]{
+  /* 宣纸 · 日间 —— 语义层引用原子层(取值不变, 零回归) */
+  --paper:var(--mz-xuan-paper);--paper-2:var(--mz-xuan-silk);--paper-sink:var(--mz-xuan-sink);
+  --ink:var(--mz-mo-800);--ink-2:var(--mz-mo-600);--ink-3:var(--mz-mo-400);
+  --line:var(--mz-mo-100);--line-2:var(--mz-mo-200);
+  --celadon:var(--mz-qing-600);--celadon-ink:var(--mz-qing-700);--celadon-soft:var(--mz-qing-100);--celadon-bright:var(--mz-qing-bright);--on-celadon:var(--mz-qing-900);
+  --cinnabar:var(--mz-zhu-600);--cinnabar-soft:var(--mz-zhu-100);--gold:var(--mz-jin-600);--gold-soft:var(--mz-jin-100);--on-accent:#f6f1e7;
+  --scrim:rgba(20,16,10,.42);
+  /* 功能 token —— 领域语义 (§C.5, 自动随主题切换) */
+  --mz-egress-pass:var(--celadon);--mz-egress-audited:var(--ink-2);--mz-egress-pending:var(--gold);--mz-egress-denied:var(--cinnabar);
+  --mz-cost-ok:var(--celadon);--mz-cost-near:var(--gold);--mz-cost-over:var(--cinnabar);
+  --mz-sov-local:var(--celadon);--mz-sov-domestic:var(--cinnabar);--mz-sov-global:var(--ink-3);
+  --mz-tier-a:var(--celadon);--mz-tier-b:var(--gold);--mz-tier-c:var(--cinnabar);
+  --mz-step-think:var(--ink-3);--mz-step-call:var(--celadon);--mz-step-ok:var(--celadon-ink);--mz-step-denied:var(--ink-3);--mz-step-egress:var(--cinnabar);--mz-step-confirm:var(--gold);--mz-step-limit:var(--gold);
+  --mz-inject-on:var(--celadon);--mz-inject-off:var(--ink-3);
+  --mz-route-cost:var(--gold);--mz-route-quality:var(--celadon);--mz-route-privacy:var(--cinnabar);--mz-route-speed:var(--celadon);--mz-route-balanced:var(--ink-3);--mz-route-code:var(--celadon);
+  /* 图谱 8 类节点(light) + 边/聚光 (§C.6.1) */
+  --graph-node-1:#46788a;--graph-node-2:#9e3b2e;--graph-node-3:#6a7f4f;--graph-node-4:#9a7a32;--graph-node-5:#7a5c8a;--graph-node-6:#b06a3a;--graph-node-7:#3f7a78;--graph-node-8:#8d887c;
+  --graph-edge:var(--line-2);--graph-edge-active:var(--cinnabar);--graph-spotlight:var(--celadon-soft);--graph-dim:.15;
+  /* 兼容别名: 旧 --gn* → 新 --graph-node-* */
+  --gn1:var(--graph-node-1);--gn2:var(--graph-node-2);--gn3:var(--graph-node-3);--gn4:var(--graph-node-4);--gn5:var(--graph-node-5);--gn6:var(--graph-node-6);--gn7:var(--graph-node-7);--gn8:var(--graph-node-8);
+  --diff-add:#e6efe0;--diff-del:#f3e3dd;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  /* 墨夜 · 夜间 —— 面层走 night, 指示色走更亮档(功能 token 自动重解析) */
+  --paper:var(--mz-night-bg);--paper-2:var(--mz-night-surface);--paper-sink:var(--mz-night-sink);
+  --ink:#e9e3d5;--ink-2:var(--mz-mo-300);--ink-3:var(--mz-mo-500);
+  --line:var(--mz-night-line);--line-2:var(--mz-night-line2);
+  --celadon:var(--mz-qing-400);--celadon-ink:#a6c6d2;--celadon-soft:var(--mz-night-qing-soft);--celadon-bright:var(--mz-qing-300);--on-celadon:#102e38;
+  --cinnabar:var(--mz-zhu-400);--cinnabar-soft:var(--mz-zhu-900);--gold:var(--mz-jin-400);--gold-soft:var(--mz-jin-900);--on-accent:#f6f1e7;
+  --scrim:rgba(0,0,0,.55);
+  /* 图谱 8 类节点(dark, 更亮档) */
+  --graph-node-1:#8fbac9;--graph-node-2:#cb5d4a;--graph-node-3:#9bb074;--graph-node-4:#c8a45a;--graph-node-5:#a989bb;--graph-node-6:#d39160;--graph-node-7:#6fb0ad;--graph-node-8:#6e6a60;
+  --diff-add:#1c2a1c;--diff-del:#2c1d1a;
+  /* 墨夜材质: 帘纹/纤维转屏幕混合、极淡 */
+  --cloud-a:rgba(255,255,255,.022);--cloud-b:rgba(128,177,163,.03);
+  --laid:repeating-linear-gradient(0deg,rgba(255,255,255,.016) 0 1px,transparent 1px 6px);
+  --grain-blend:screen;--grain-opacity:.05;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background-color:var(--paper);color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  background-image:radial-gradient(135% 90% at 12% -5%,var(--cloud-a),transparent 55%),radial-gradient(120% 80% at 100% 105%,var(--cloud-b),transparent 50%);
+  transition:background-color var(--t),color var(--t);overflow:hidden}
+/* 宣纸纤维 + 帘纹固定材质层 (§F · 墨韵基底) */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.16' intercept='0.78'/%3E%3CfeFuncG type='linear' slope='0.16' intercept='0.78'/%3E%3CfeFuncB type='linear' slope='0.16' intercept='0.78'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),var(--laid);
+  background-size:220px 220px,100% 6px;opacity:var(--grain-opacity);mix-blend-mode:var(--grain-blend)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.mono,.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:var(--rail-w) 1fr;height:100vh;
+  grid-template-areas:"top top" "rail main" "rail status"}
+/* topbar */
+.topbar{grid-area:top;display:flex;align-items:center;gap:16px;padding:10px 18px;background:var(--paper-2);border-bottom:1px solid var(--line);transition:var(--t)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.seal{width:34px;height:34px;flex:none;display:inline-flex;align-items:center;justify-content:center;filter:drop-shadow(0 1px 1.5px rgba(34,30,22,.22))}
+.seal svg{width:34px;height:34px;display:block}
+.brand b{font-family:var(--font-serif);font-size:17px;letter-spacing:.5px}
+.brand .sub{font-size:11px;color:var(--ink-3);margin-left:2px}
+.spacer{flex:1}
+.kbtn{display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink-2);font-size:12.5px;transition:var(--t)}
+.kbtn:hover{border-color:var(--celadon);color:var(--ink)}
+.kbtn kbd{font-family:var(--font-mono);font-size:11px;background:var(--paper-sink);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dot.on{background:var(--celadon)}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);padding:3px 9px;border:1px solid var(--line);border-radius:20px}
+.iconbtn{width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-2);transition:var(--t)}
+.iconbtn:hover{background:var(--paper-sink);color:var(--ink)}
+/* rail */
+.rail{grid-area:rail;background:var(--paper-2);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:4px;transition:var(--t)}
+.railitem{position:relative;width:44px;height:44px;border-radius:var(--r-md);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink-3);transition:var(--t)}
+.railitem .lbl{font-size:10px;font-family:var(--font-serif)}
+.railitem:hover{background:var(--paper-sink);color:var(--ink-2)}
+.railitem.active{color:var(--celadon-ink);background:var(--celadon-soft)}
+.railitem.active::before{content:"";position:absolute;left:-1px;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--celadon)}
+.railitem svg{width:21px;height:21px}
+.railitem .reddot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--cinnabar);box-shadow:0 0 0 2px var(--paper-2)}
+.railfoot{margin-top:auto;margin-bottom:10px}
+/* main */
+.main{grid-area:main;position:relative;overflow:hidden}
+.surface{position:absolute;inset:0;display:none;overflow:auto}
+.surface.active{display:block}
+.surface-head{padding:14px 22px 0;display:flex;align-items:center;gap:12px}
+.surface-head h1{font-family:var(--font-serif);font-size:19px;margin:0;font-weight:600}
+.surface-head .hint{font-size:12px;color:var(--ink-3)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-family:var(--font-mono);color:var(--ink-2);background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.chip.celadon{color:var(--celadon-ink);background:var(--celadon-soft);border-color:transparent}
+.chip.cinnabar{color:var(--cinnabar);background:var(--cinnabar-soft);border-color:transparent}
+.chip.gold{color:var(--gold);background:var(--gold-soft);border-color:transparent}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;transition:var(--t)}
+.muted{color:var(--ink-3);font-size:13px}
+.score-bar{height:5px;background:var(--paper-sink);border-radius:3px;overflow:hidden;margin-top:4px}
+.score-bar>div{height:100%;background:var(--celadon)}
+/* status */
+.status{grid-area:status;height:var(--statusbar-h);background:var(--paper-2);border-top:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 18px;font-size:11.5px;color:var(--ink-2);transition:var(--t)}
+.status .num{color:var(--ink)}
+.quota{display:flex;align-items:center;gap:7px}
+.quota .bar{width:90px;height:5px;background:var(--paper-sink);border-radius:3px;overflow:hidden}
+.quota .bar>div{height:100%;width:34%;background:var(--celadon)}
+/* ===== CHAT ===== */
+.chat-wrap{max-width:760px;margin:0 auto;padding:18px 22px}
+.msg{margin-bottom:16px}
+.msg .role{font-size:11px;color:var(--ink-3);margin-bottom:5px;font-family:var(--font-mono)}
+.bubble{padding:12px 15px;border-radius:var(--r-md);line-height:1.7;font-size:14px}
+.msg.user .bubble{background:var(--celadon-bright);color:var(--on-celadon);display:inline-block}
+.msg.bot .bubble{background:var(--paper-2);border:1px solid var(--line)}
+.reasoning{border-left:2px solid var(--line-2);padding:4px 0 4px 12px;margin:4px 0 10px;color:var(--ink-2);font-size:12.5px}
+.reasoning summary{cursor:pointer;color:var(--ink-3);font-family:var(--font-mono);font-size:11.5px}
+.codeblock{background:#1b1f26;color:#e6e1d4;border-radius:var(--r-sm);padding:11px 13px;font-family:var(--font-mono);font-size:12.5px;overflow:auto;margin:8px 0}
+.codeblock .kw{color:#cb5d4a}.codeblock .st{color:#9bb074}.codeblock .fn{color:#8fbac9}.codeblock .cm{color:#6e6a60}
+.ground{margin-top:8px}
+.ground .gh{font-size:11px;color:var(--ink-3);margin-bottom:6px}
+.hitcard{cursor:pointer;border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 11px;margin-bottom:6px;background:var(--paper-2);transition:var(--t)}
+.hitcard:hover{border-color:var(--celadon);transform:translateX(2px)}
+.hitcard .t{font-size:13px;font-weight:500}
+.hitcard .src{font-size:11px;color:var(--ink-3);font-family:var(--font-mono);margin-top:3px}
+/* ===== GRAPH ===== */
+.graph-grid{position:absolute;inset:0;display:grid;grid-template-columns:1fr 270px;grid-template-rows:auto 1fr}
+.graph-toolbar{grid-column:1/3;display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--line-2);border-radius:var(--r-sm);overflow:hidden}
+.seg button{padding:5px 12px;font-size:12.5px;color:var(--ink-2)}
+.seg button.on{background:var(--celadon-soft);color:var(--on-celadon)}
+.mini-input{padding:5px 10px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-size:12.5px;font-family:var(--font-sans)}
+.graph-canvas-wrap{position:relative;background:var(--paper-sink);overflow:hidden}
+#graphCanvas{display:block;width:100%;height:100%;cursor:grab}
+#graphCanvas:active{cursor:grabbing}
+.legend{position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:4px 10px;max-width:60%;font-size:11px;color:var(--ink-2);background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 10px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:-1px}
+.graph-side{border-left:1px solid var(--line);padding:14px;overflow:auto;background:var(--paper-2)}
+.graph-side h3{font-family:var(--font-serif);font-size:14px;margin:0 0 8px}
+.edge{font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--line);line-height:1.5}
+.edge b{color:var(--ink)}
+.edge .pred{color:var(--celadon-ink);font-family:var(--font-mono);font-size:11px;margin:0 6px}
+.a11y-note{font-size:11px;color:var(--ink-3);margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+/* ===== COWORK / CODE shared timeline ===== */
+.work-grid{position:absolute;inset:0;display:grid;grid-template-columns:1fr 320px;grid-template-rows:auto 1fr auto}
+.work-head{grid-column:1/3;padding:13px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.work-input{flex:1;min-width:220px;padding:8px 12px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-size:13px}
+.runbtn{padding:8px 16px;background:var(--celadon);color:var(--on-accent);border-radius:var(--r-sm);font-size:13px;font-weight:500;transition:var(--t)}
+.runbtn:hover{filter:brightness(1.08)}
+.runbtn.stop{background:var(--cinnabar)}
+.timeline{padding:16px 18px;overflow:auto;position:relative}
+.timeline::before{content:"";position:absolute;left:30px;top:18px;bottom:18px;width:2px;background:var(--line-2)}
+.step{position:relative;padding-left:34px;margin-bottom:14px;animation:rise .28s var(--t)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.step .dot{position:absolute;left:6px;top:3px;width:13px;height:13px;border-radius:50%;background:var(--celadon);border:2px solid var(--paper)}
+.step.denied .dot{background:var(--cinnabar)}.step.limit .dot{background:var(--gold)}
+.step .lab{font-size:11px;color:var(--ink-3);font-family:var(--font-mono)}
+.step .body{margin-top:3px;font-size:13px;line-height:1.6}
+.toolchip{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:12px;background:var(--celadon-soft);color:var(--on-celadon);border-radius:6px;padding:3px 9px}
+.toolchip.pending{background:var(--paper-sink);color:var(--ink-3)}
+.toolchip .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.seal-card{border:1px solid var(--cinnabar);background:var(--cinnabar-soft);color:var(--cinnabar);border-radius:var(--r-sm);padding:8px 11px;font-size:12.5px;margin-top:4px}
+.tool-result{margin-top:5px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 10px;font-size:12px}
+.tool-result .h{font-size:11px;color:var(--ink-3);margin-bottom:3px}
+.work-side{grid-row:2/4;border-left:1px solid var(--line);padding:14px;background:var(--paper-2);overflow:auto}
+.work-side h3{font-family:var(--font-serif);font-size:13px;margin:0 0 9px}
+.kv{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+.kv span:last-child{font-family:var(--font-mono);color:var(--ink)}
+.artifact{grid-column:1/2;border-top:1px solid var(--line);padding:12px 18px;background:var(--paper-2);max-height:160px;overflow:auto}
+.artifact .h{font-size:11px;color:var(--ink-3);font-family:var(--font-mono);margin-bottom:6px;display:flex;gap:8px;align-items:center}
+.artifact .act{margin-left:auto;display:flex;gap:6px}
+.smallbtn{font-size:11.5px;padding:3px 9px;border:1px solid var(--line-2);border-radius:5px;color:var(--ink-2)}
+.smallbtn:hover{border-color:var(--celadon);color:var(--ink)}
+/* ===== COWORK · 多智能体协同工作区 (Slack 式) ===== */
+.surface[data-surface="cowork"]{overflow:hidden}
+.surface[data-surface="cowork"].active{display:grid;grid-template-columns:214px minmax(0,1fr) 290px}
+/* —— 左侧栏 —— */
+.cw-side{border-right:1px solid var(--line);background:var(--paper-2);overflow:auto;display:flex;flex-direction:column;padding:8px 0}
+.cw-side-sec{padding:4px 10px 14px}
+.cw-side-h{display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-micro);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:8px 4px 8px}
+.cw-newbtn{width:20px;height:20px;border-radius:6px;border:1px solid var(--line-2);color:var(--ink-3);font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.cw-newbtn:hover{border-color:var(--celadon);color:var(--celadon-ink)}
+.cw-presence-sum{font-size:var(--fs-micro);color:var(--celadon-ink);background:var(--celadon-soft);border-radius:999px;padding:1px 8px;text-transform:none;letter-spacing:0}
+.cw-mate{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:var(--r-sm);transition:var(--t)}
+.cw-mate:hover{background:var(--paper-sink)}
+.cw-mate-tx{min-width:0;line-height:1.25}
+.cw-mate .nm{font-size:var(--fs-sm);color:var(--ink)}
+.cw-mate .st{font-size:var(--fs-micro);color:var(--ink-3);font-family:var(--font-mono)}
+.cw-av{flex:none;display:flex;align-items:center;justify-content:center;color:var(--on-accent);position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),var(--shadow-1);font-family:var(--font-serif);font-weight:600}
+.cw-av.lg{width:28px;height:28px;border-radius:8px;font-size:13px}.cw-av.lg svg{width:16px;height:16px}
+.cw-av.md{width:26px;height:26px;border-radius:7px;font-size:12px}.cw-av.md svg{width:15px;height:15px}
+.cw-av.sm{width:20px;height:20px;border-radius:6px;font-size:10px}.cw-av.sm svg{width:12px;height:12px}
+.cw-av .pdot{position:absolute;right:-3px;bottom:-3px;width:9px;height:9px;border-radius:50%;border:2px solid var(--paper-2)}
+.pdot.online{background:var(--celadon)}.pdot.working{background:var(--gold);animation:blink 1s infinite}.pdot.done{background:var(--graph-node-3)}.pdot.idle{background:var(--ink-3)}
+.cw-sess{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:var(--r-sm);cursor:pointer;color:var(--ink-2);font-size:var(--fs-sm);transition:var(--t)}
+.cw-sess:hover{background:var(--paper-sink);color:var(--ink)}
+.cw-sess.active{background:var(--celadon-soft);color:var(--celadon-ink)}
+.cw-sess .hash{font-family:var(--font-mono);color:var(--ink-3)}.cw-sess.active .hash{color:var(--celadon)}
+.cw-sess .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cw-sess .rd{width:7px;height:7px;border-radius:50%;background:var(--cinnabar);flex:none}
+/* —— 中栏 —— */
+.cw-main{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;min-width:0;min-height:0}
+.cw-chan-head{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cw-chan-title{font-family:var(--font-serif);font-size:16px;font-weight:600}
+.cw-chan-meta{display:flex;align-items:center;gap:7px;margin-left:auto;flex-wrap:wrap}
+.cw-members{display:flex;align-items:center}
+.cw-members .cw-av{margin-left:-7px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 0 0 2px var(--paper-2)}
+.cw-members .cw-av:first-child{margin-left:0}
+/* 任务看板条 */
+.cw-plan{display:flex;gap:8px;padding:9px 18px;border-bottom:1px solid var(--line);overflow-x:auto}
+.cw-pcard{flex:none;display:flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:var(--paper-2);font-size:var(--fs-sm);color:var(--ink-2);transition:var(--t);white-space:nowrap}
+.cw-pcard .pi{width:14px;height:14px;display:flex;align-items:center;justify-content:center;color:var(--ink-3)}.cw-pcard .pi svg{width:14px;height:14px}
+.cw-pcard.todo{opacity:.65}
+.cw-pcard.doing{border-color:var(--gold);color:var(--ink);box-shadow:0 0 0 2px var(--gold-soft)}.cw-pcard.doing .pi{color:var(--gold)}
+.cw-pcard.done{border-color:transparent;background:var(--celadon-soft);color:var(--celadon-ink)}.cw-pcard.done .pi{color:var(--celadon)}
+.cw-pcard.blocked{border-color:var(--cinnabar);color:var(--cinnabar);background:var(--cinnabar-soft)}.cw-pcard.blocked .pi{color:var(--cinnabar)}
+.cw-pcard.skipped{opacity:.5;text-decoration:line-through}
+/* 活动流 */
+.cw-stream{overflow:auto;padding:14px 20px 8px;display:flex;flex-direction:column;gap:13px}
+.cw-empty{margin:auto;max-width:430px;text-align:center;color:var(--ink-3);font-size:var(--fs-sm);line-height:1.75;padding:24px 10px}
+.cw-empty .big{font-family:var(--font-serif);font-size:17px;color:var(--ink-2);margin-bottom:8px;display:block}
+.cw-msg{display:flex;gap:10px;animation:rise .28s var(--t)}
+.cw-bd{min-width:0;flex:1}
+.cw-hd{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.cw-hd .cw-nm{font-size:var(--fs-sm);font-weight:600;color:var(--ink)}
+.cw-hd .cw-tm{font-size:var(--fs-micro);color:var(--ink-3);font-family:var(--font-mono)}
+.cw-hd .cw-role{font-size:var(--fs-micro);color:var(--ink-3);background:var(--paper-sink);border-radius:5px;padding:0 6px;font-family:var(--font-mono)}
+.cw-tx{font-size:var(--fs-body);line-height:1.6;color:var(--ink)}
+.cw-msg.user .cw-tx{background:var(--celadon-bright);color:var(--on-celadon);display:inline-block;padding:8px 13px;border-radius:11px}
+.cw-msg.reason .cw-tx{color:var(--ink-2)}
+.cw-at{font-family:var(--font-mono);font-size:.9em;color:var(--celadon-ink);background:var(--celadon-soft);border-radius:5px;padding:0 5px;white-space:nowrap}
+.cw-sys{align-self:center;font-size:var(--fs-meta);color:var(--ink-3);font-family:var(--font-mono);background:var(--paper-sink);border:1px solid var(--line);border-radius:999px;padding:3px 12px;animation:rise .28s var(--t)}
+/* 工具卡 */
+.cw-tool{margin-top:7px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--paper-2);overflow:hidden}
+.cw-tool-h{display:flex;align-items:center;gap:8px;padding:7px 11px;font-family:var(--font-mono);font-size:var(--fs-sm)}
+.cw-tool-h .tnm{color:var(--celadon-ink)}.cw-tool-h .targ{color:var(--ink-3)}
+.cw-tool-h .pulse{width:6px;height:6px;border-radius:50%;background:var(--celadon);animation:blink 1s infinite}
+.cw-tool-h .tok{margin-left:auto;color:var(--celadon)}
+.cw-tool.pending .cw-tool-h{color:var(--ink-3)}
+.cw-tool-b{padding:0 11px 9px;font-size:var(--fs-sm);line-height:1.55;color:var(--ink)}
+.cw-badge-inject{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-meta);color:var(--celadon-ink);background:var(--celadon-soft);border-radius:6px;padding:2px 8px;margin-top:7px;font-family:var(--font-mono)}
+/* HITL 审批卡 */
+.cw-hitl{margin-top:7px;border:1px solid var(--gold);background:var(--gold-soft);border-radius:var(--r-md);padding:11px 13px}
+.cw-hitl .hh{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:var(--fs-sm);color:var(--gold);margin-bottom:5px}
+.cw-hitl .hb{font-size:var(--fs-sm);color:var(--ink);line-height:1.55;margin-bottom:10px}
+.cw-hitl .hb code{font-family:var(--font-mono);font-size:.88em;background:var(--paper-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink-2)}
+.cw-hitl .ha{display:flex;gap:8px}
+.cw-hitl .hbtn{font-size:var(--fs-sm);padding:6px 15px;border-radius:var(--r-sm);font-weight:500;transition:var(--t)}
+.cw-hitl .hbtn.ok{background:var(--celadon);color:var(--on-accent)}.cw-hitl .hbtn.ok:hover{filter:brightness(1.08)}
+.cw-hitl .hbtn.no{background:var(--paper-2);border:1px solid var(--line-2);color:var(--ink-2)}.cw-hitl .hbtn.no:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.cw-hitl.resolved .ha{display:none}
+.cw-hitl.resolved{filter:saturate(.55);opacity:.85}
+.cw-hitl .hres{font-size:var(--fs-sm);font-family:var(--font-mono);margin-top:2px}
+/* 朱砂封条 */
+.cw-seal{margin-top:7px;display:flex;align-items:flex-start;gap:8px;border:1px solid var(--cinnabar);background:var(--cinnabar-soft);color:var(--cinnabar);border-radius:var(--r-md);padding:9px 12px;font-size:var(--fs-sm);line-height:1.5;font-family:var(--font-mono)}
+.cw-seal .si{flex:none;margin-top:1px;font-weight:700}
+/* reactions + 线程 */
+.cw-react{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.cw-rx{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-meta);border:1px solid var(--line);border-radius:999px;padding:1px 9px;color:var(--ink-2);cursor:pointer;transition:var(--t);font-family:var(--font-mono)}
+.cw-rx:hover{border-color:var(--celadon)}
+.cw-rx.on{background:var(--celadon-soft);border-color:transparent;color:var(--celadon-ink)}
+.cw-rx.add{color:var(--ink-3);padding:1px 7px}
+.cw-thread{margin-top:7px}
+.cw-thread-tog{display:inline-flex;align-items:center;gap:7px;font-size:var(--fs-meta);color:var(--celadon-ink);cursor:pointer;font-family:var(--font-mono)}
+.cw-thread-tog:hover{text-decoration:underline}
+.cw-thread-tog .cw-av{margin-left:-5px}.cw-thread-tog .cw-av:first-child{margin-left:0}
+.cw-tav{display:flex;align-items:center}
+.cw-thread-body{display:none;margin-top:8px;padding-left:11px;border-left:2px solid var(--line-2);flex-direction:column;gap:8px}
+.cw-thread.open .cw-thread-body{display:flex}
+.cw-thread-msg{font-size:var(--fs-sm);color:var(--ink-2);line-height:1.5}
+.cw-thread-msg .rt{font-family:var(--font-mono);font-size:var(--fs-meta);color:var(--ink-3);margin-right:6px}
+/* typing 指示 */
+.cw-typing{display:flex;gap:10px;align-items:center;animation:rise .2s var(--t)}
+.cw-typing .dots{display:flex;gap:4px;align-items:center;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.cw-typing .dots i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:cwbounce 1.2s infinite}
+.cw-typing .dots i:nth-child(2){animation-delay:.15s}.cw-typing .dots i:nth-child(3){animation-delay:.3s}
+@keyframes cwbounce{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+/* composer */
+.cw-composer{border-top:1px solid var(--line);padding:10px 18px 12px;background:var(--paper-2)}
+.cw-comp-tools{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.cw-cbtn{width:27px;height:27px;border-radius:7px;border:1px solid var(--line);color:var(--ink-3);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;transition:var(--t)}
+.cw-cbtn:hover{border-color:var(--celadon);color:var(--celadon-ink)}
+.cw-comp-pills{margin-left:auto;display:flex;gap:6px}
+.cw-comp-row{display:flex;align-items:flex-end;gap:10px;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:6px 8px 6px 14px;box-shadow:var(--shadow-1);transition:var(--t)}
+.cw-comp-row:focus-within{border-color:var(--celadon);box-shadow:0 0 0 3px var(--celadon-soft)}
+.cw-input{flex:1;border:none;background:none;color:var(--ink);font-family:var(--font-sans);font-size:var(--fs-body);line-height:1.5;resize:none;outline:none;max-height:120px;padding:5px 0}
+.cw-send{flex:none;align-self:stretch;border-radius:var(--r-md);padding:0 18px}
+.cw-comp-hint{font-size:var(--fs-micro);color:var(--ink-3);margin-top:7px;font-family:var(--font-mono)}
+.cw-comp-hint kbd{font-family:var(--font-mono);font-size:10px;background:var(--paper-sink);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+/* 右栏 回执 */
+.cw-receipt{border-left:1px solid var(--line);background:var(--paper-2);overflow:auto;padding:14px}
+.cw-r-sec{margin-bottom:18px}
+.cw-r-sec h3{font-family:var(--font-serif);font-size:13px;margin:0 0 10px;display:flex;align-items:center;gap:7px}
+.cw-r-sec .seal-dot{width:7px;height:7px;border-radius:50%;background:var(--celadon);flex:none}
+.cw-art-acts{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+/* 溯源:流内命中卡 / 实体 chip / diff 迷你卡 */
+.cw-hit{display:flex;align-items:center;gap:8px;padding:6px 10px;margin-top:6px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--paper-2);cursor:pointer;transition:var(--t)}
+.cw-hit:hover{border-color:var(--celadon);transform:translateX(2px)}
+.cw-hit .h-t{font-size:var(--fs-sm);color:var(--ink)}
+.cw-hit .h-s{font-size:var(--fs-micro);color:var(--ink-3);font-family:var(--font-mono);margin-left:auto}
+.cw-ent{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:.9em;color:var(--on-celadon);background:var(--celadon-soft);border-radius:5px;padding:1px 7px;cursor:pointer;transition:var(--t)}
+.cw-ent:hover{box-shadow:0 0 0 2px var(--celadon-soft)}
+.cw-ent .d{width:7px;height:7px;border-radius:50%;flex:none}
+.cw-diff{margin-top:7px;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;cursor:pointer;transition:var(--t)}
+.cw-diff:hover{border-color:var(--celadon)}
+.cw-diff .d-h{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:var(--fs-sm);color:var(--celadon-ink)}
+.cw-diff .d-h .d-x{margin-left:auto;font-size:var(--fs-meta);color:var(--ink-3)}
+.cw-diff pre{margin:0;padding:8px 11px;font-family:var(--font-mono);font-size:12px;line-height:1.55;background:var(--paper);overflow-x:auto;white-space:pre}
+.cw-diff .add{color:#6a7f4f}.cw-diff .del{color:var(--cinnabar)}
+/* 关联 账本 */
+.cw-links{display:flex;flex-direction:column;gap:6px}
+.cw-link{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--paper-2);cursor:pointer;transition:var(--t)}
+.cw-link:hover{border-color:var(--celadon);transform:translateX(2px)}
+.cw-link .lk-ic{width:22px;height:22px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--on-accent)}
+.cw-link .lk-ic svg{width:13px;height:13px}
+.cw-link .lk-tx{min-width:0}
+.cw-link .lk-t{font-size:var(--fs-sm);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cw-link .lk-s{font-size:var(--fs-micro);color:var(--ink-3);font-family:var(--font-mono)}
+/* peek 抽屉 */
+.cw-peek{position:absolute;inset:0;z-index:60;display:flex;justify-content:flex-end}
+.cw-peek[hidden]{display:none}
+.cw-peek-scrim{position:absolute;inset:0;background:var(--scrim)}
+.cw-peek-panel{position:relative;width:380px;max-width:86%;background:var(--paper-2);border-left:1px solid var(--line-2);box-shadow:var(--shadow-2);display:flex;flex-direction:column;animation:cwslide .22s var(--t)}
+@keyframes cwslide{from{transform:translateX(28px);opacity:.5}to{transform:none;opacity:1}}
+.cw-peek-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.cw-peek-head #cwPeekTitle{font-family:var(--font-serif);font-size:15px;font-weight:600;flex:1;min-width:0}
+.cw-peek-x{width:26px;height:26px;border-radius:6px;color:var(--ink-3);font-size:13px}
+.cw-peek-x:hover{background:var(--paper-sink);color:var(--ink)}
+.cw-peek-body{flex:1;overflow:auto;padding:14px}
+.cw-peek-kind{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:var(--fs-meta);color:var(--ink-3);margin-bottom:10px}
+.cw-peek-kind .d{width:8px;height:8px;border-radius:50%}
+.cw-peek-chunk{border-left:2px solid var(--line-2);padding:2px 0 10px 12px;margin-bottom:6px;font-size:var(--fs-sm);line-height:1.55;color:var(--ink-2)}
+.cw-peek-tri{font-size:var(--fs-sm);padding:4px 0;border-bottom:1px dashed var(--line)}
+.cw-peek-tri .pr{color:var(--celadon-ink);font-family:var(--font-mono);font-size:var(--fs-meta);margin:0 6px}
+.cw-peek-foot{padding:12px 14px;border-top:1px solid var(--line)}
+.cw-peek-foot .runbtn{width:100%;padding:9px}
+/* 反向入口按钮 */
+.cw-entry{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 11px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--paper);color:var(--celadon-ink);transition:var(--t)}
+.cw-entry:hover{border-color:var(--celadon);background:var(--celadon-soft)}
+.cw-entry svg{width:13px;height:13px}
+.cw-iconbtn{padding:8px 13px;display:inline-flex;align-items:center;justify-content:center}
+.cw-iconbtn svg{display:block}
+/* 人类头像(字) / AI 头像 */
+.cw-av-h{font-family:var(--font-serif);font-weight:600}
+.cw-av.lg.cw-av-h{font-size:13px}.cw-av.md.cw-av-h{font-size:12px}.cw-av.sm.cw-av-h{font-size:10px}
+.cw-av-ai svg{width:62%;height:62%}
+.cw-aitag{font-family:var(--font-mono);font-size:9px;color:var(--celadon-ink);background:var(--celadon-soft);border-radius:4px;padding:0 4px;vertical-align:1px}
+/* 智能体工作台 入口 + 抽屉 */
+.cw-inspect{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 11px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink-2);transition:var(--t)}
+.cw-inspect:hover{border-color:var(--celadon);color:var(--celadon-ink)}
+.cw-inspect svg{width:15px;height:15px}
+.cw-inspector .cw-peek-panel{width:468px}
+.cw-ins-note{font-size:12px;line-height:1.55;color:var(--ink-3);background:var(--paper-sink);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 10px;margin-bottom:12px}
+.cw-ins-team{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;margin-bottom:6px}
+.cw-ins-stream{display:flex;flex-direction:column;gap:11px;margin:6px 0;padding:11px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cw-ins-stream:empty{display:none}
+.cw-ins-receipt h4{font-family:var(--font-serif);font-size:13px;margin:12px 0 8px}
+.cw-insp-link{color:var(--celadon-ink);font-size:var(--fs-meta);font-family:var(--font-mono);cursor:pointer}
+.cw-insp-link:hover{text-decoration:underline}
+.cw-csend{padding:8px 11px}.cw-csend svg{width:16px;height:16px;display:block}
+@media(max-width:1180px){.surface[data-surface="cowork"].active{grid-template-columns:minmax(0,1fr)}.cw-side,.cw-receipt{display:none}}
+/* 演示导览 guided tour */
+#tourRing{position:fixed;z-index:300;border:2px solid var(--celadon);border-radius:10px;box-shadow:0 0 0 9999px rgba(20,16,10,.5);pointer-events:none;transition:top .3s var(--t),left .3s var(--t),width .3s var(--t),height .3s var(--t)}
+:root[data-theme="dark"] #tourRing{box-shadow:0 0 0 9999px rgba(0,0,0,.62)}
+#tourRing[hidden]{display:none}
+#tourPanel{position:fixed;left:50%;bottom:42px;transform:translateX(-50%);width:440px;max-width:92vw;background:var(--paper-2);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow-2);z-index:320;padding:14px 16px}
+#tourPanel[hidden]{display:none}
+.tour-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tour-step{font-family:var(--font-mono);font-size:11px;color:var(--on-celadon);background:var(--celadon-soft);border-radius:999px;padding:1px 9px;flex:none}
+.tour-title{font-family:var(--font-serif);font-size:15px;font-weight:600;flex:1}
+.tour-x{width:24px;height:24px;border-radius:6px;color:var(--ink-3);flex:none}.tour-x:hover{background:var(--paper-sink);color:var(--ink)}
+.tour-body{font-size:13.5px;line-height:1.62;color:var(--ink-2);margin-bottom:11px}
+.tour-check{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tour-ck{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-family:var(--font-mono);color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:2px 9px;transition:var(--t)}
+.tour-ck.on{color:var(--celadon-ink);background:var(--celadon-soft);border-color:transparent}
+.tour-ck .b{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--ink-3)}
+.tour-ck.on .b{background:var(--celadon);border-color:var(--celadon);color:var(--on-accent)}
+.tour-ctl{display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.tour-ctl .runbtn{padding:6px 16px}
+/* ===== CODE diff ===== */
+.code-grid{position:absolute;inset:0;display:grid;grid-template-columns:1fr 320px;grid-template-rows:minmax(0,1fr) auto}
+.code-composer{border-top:1px solid var(--line);padding:11px 18px;background:var(--paper-2)}
+.code-composer .cw-comp-row{max-width:920px;margin:0 auto}
+/* 对答 列布局 + 底部 composer */
+.surface[data-surface="chat"]{overflow:hidden}
+.surface[data-surface="chat"].active{display:flex;flex-direction:column}
+.chat-scroll{flex:1;min-height:0;overflow:auto}
+.chat-composer{flex:none;border-top:1px solid var(--line);padding:12px 22px;background:var(--paper-2)}
+.chat-composer .cw-comp-row{max-width:760px;margin:0 auto}
+.chat-model .pill{white-space:nowrap}
+.chat-model .modelmenu{right:auto;left:0}
+.modelmenu.up{top:auto;bottom:42px}
+.diff{font-family:var(--font-mono);font-size:12.5px;line-height:1.65;padding:14px 0;overflow:auto}
+.diff .ln{display:flex;padding:0 16px}
+.diff .ln .no{width:34px;color:var(--ink-3);user-select:none;text-align:right;padding-right:12px}
+.diff .ln.add{background:var(--diff-add)}.diff .ln.add .mk{color:#6a7f4f}
+.diff .ln.del{background:var(--diff-del)}.diff .ln.del .mk{color:var(--cinnabar)}
+.diff .mk{width:14px;display:inline-block}
+.diff .kw{color:var(--cinnabar)}.diff .st{color:var(--gold)}.diff .fn{color:var(--celadon-ink)}.diff .cm{color:var(--ink-3)}
+/* ===== VAULT ===== */
+.vault-grid{position:absolute;inset:0;display:grid;grid-template-columns:340px 1fr}
+.vault-list{border-right:1px solid var(--line);overflow:auto;padding:14px}
+.vault-search{display:flex;gap:6px;margin-bottom:12px}
+.vault-search input{flex:1;padding:7px 11px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-size:13px}
+.doccard{cursor:pointer;border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px;margin-bottom:8px;background:var(--paper-2);transition:var(--t)}
+.doccard:hover,.doccard.sel{border-color:var(--celadon);background:var(--celadon-soft)}
+.doccard .t{font-family:var(--font-serif);font-size:14px}
+.doccard .meta{font-size:11px;color:var(--ink-3);font-family:var(--font-mono);margin-top:4px}
+.vault-detail{overflow:auto;padding:18px 22px;display:grid;grid-template-columns:1fr 220px;gap:18px}
+.chunkpage{border-left:2px solid var(--line-2);padding:4px 0 14px 14px;margin-bottom:6px;position:relative}
+.chunkpage .no{position:absolute;left:-9px;top:0;font-size:10px;font-family:var(--font-mono);color:var(--ink-3);background:var(--paper);padding:0 2px}
+.relations h4{font-family:var(--font-serif);font-size:13px;margin:0 0 6px}
+.storage{font-size:11px;font-family:var(--font-mono);color:var(--gold)}
+/* vault view toggle + Notion-style timeline */
+.surface[data-surface="vault"].active{display:flex;flex-direction:column;overflow:hidden}
+.vault-toolbar{flex:none;display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--line)}
+.vault-body{flex:1;position:relative;overflow:hidden}
+.vault-tl{position:absolute;inset:0;overflow:auto}
+.tl-inner{position:relative}
+.tl-axis{position:sticky;top:0;height:50px;z-index:3;background:var(--paper-2);border-bottom:1px solid var(--line)}
+.tl-mon{position:absolute;top:7px;font-size:13px;font-family:var(--font-serif);color:var(--ink-2)}
+.tl-day{position:absolute;top:28px;font-size:11px;color:var(--ink-3);font-family:var(--font-mono);transform:translateX(-50%)}
+.tl-grid{position:absolute;top:50px;bottom:0;width:1px;background:var(--line);opacity:.4;z-index:0}
+.tl-today{position:absolute;top:6px;bottom:0;width:2px;background:var(--cinnabar);z-index:1}
+.tl-todaydot{position:absolute;top:27px;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:var(--cinnabar);color:var(--on-accent);font-size:11px;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;z-index:4}
+.tl-rows{position:relative;z-index:2;padding:18px 0 60px}
+.tl-row{position:relative;height:42px}
+.tl-card{position:absolute;display:inline-flex;align-items:center;gap:8px;background:var(--paper-2);border:1px solid var(--line);border-radius:9px;padding:6px 11px;box-shadow:var(--shadow-1);white-space:nowrap;cursor:pointer;transition:var(--t)}
+.tl-card:hover{border-color:var(--celadon);transform:translateY(-1px);box-shadow:var(--shadow-2)}
+.tl-card .tl-ic{color:var(--ink-2);display:flex}.tl-card .tl-ic svg{width:15px;height:15px}
+.tl-card .tl-title{font-size:13px;max-width:320px;overflow:hidden;text-overflow:ellipsis}
+.tl-card .tl-d{font-size:11px;color:var(--ink-3);font-family:var(--font-mono)}
+.chip.green{color:var(--gn3);background:color-mix(in srgb,var(--gn3) 18%,transparent);border-color:transparent}
+/* ===== command palette ===== */
+.scrim{position:fixed;inset:0;background:var(--scrim);display:none;align-items:flex-start;justify-content:center;z-index:100;padding-top:12vh}
+.scrim.open{display:flex}
+.palette{width:560px;max-width:90vw;background:var(--paper-2);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow-2);overflow:hidden}
+.palette input{width:100%;padding:15px 18px;border:none;background:none;color:var(--ink);font-size:15px;border-bottom:1px solid var(--line);outline:none;font-family:var(--font-sans)}
+.palette .results{max-height:340px;overflow:auto;padding:6px}
+.pgroup{font-size:10.5px;color:var(--ink-3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px}
+.pitem{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--r-sm);font-size:13.5px;cursor:pointer}
+.pitem .ic{color:var(--ink-3);display:flex}.pitem .ic svg{width:16px;height:16px}
+.pitem .sub{margin-left:auto;font-size:11px;color:var(--ink-3);font-family:var(--font-mono)}
+.pitem.cur{background:var(--celadon-soft);color:var(--on-celadon)}
+.pitem.cur .ic,.pitem.cur .sub{color:var(--celadon-ink)}
+/* topbar model picker + privacy toggle + toast */
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:5px 11px;border:1px solid var(--line-2);border-radius:20px;background:var(--paper);color:var(--ink-2);transition:var(--t)}
+.pill:hover{border-color:var(--celadon);color:var(--ink)}
+.pill .ic{display:flex}.pill .ic svg{width:14px;height:14px}
+.pill.sov{border-color:var(--cinnabar);color:var(--cinnabar);background:var(--cinnabar-soft)}
+.langseg{display:flex;border:1px solid var(--line-2);border-radius:20px;overflow:hidden}
+.langseg button{padding:4px 11px;font-size:12px;color:var(--ink-2);transition:var(--t)}
+.langseg button:hover{color:var(--ink)}
+.langseg button.on{background:var(--celadon-soft);color:var(--celadon-ink)}
+.modelwrap{position:relative}
+.modelmenu{position:absolute;top:40px;right:0;width:266px;background:var(--paper-2);border:1px solid var(--line-2);border-radius:var(--r-md);box-shadow:var(--shadow-2);z-index:90;overflow:hidden;display:none}
+.modelmenu.open{display:block}
+.mm-group{font-size:10.5px;color:var(--ink-3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;padding:9px 12px 3px}
+.mm-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;font-size:13px;transition:var(--t)}
+.mm-item:hover{background:var(--celadon-soft)}
+.mm-item.cur{background:var(--celadon-soft)}.mm-item.cur .nm{color:var(--celadon-ink)}
+.mm-item.blocked{opacity:.5;cursor:not-allowed}.mm-item.blocked:hover{background:none}
+.mm-item .nm{flex:1}
+.mm-item .tg{font-size:10.5px;font-family:var(--font-mono);color:var(--ink-3)}
+.mm-item .ck{color:var(--celadon);width:14px;visibility:hidden}.mm-item.cur .ck{visibility:visible}
+.mm-item .lock{color:var(--cinnabar);display:flex}.mm-item .lock svg{width:13px;height:13px}
+#toast{position:fixed;left:50%;bottom:46px;transform:translateX(-50%) translateY(8px);background:var(--paper-2);border:1px solid var(--celadon);color:var(--celadon-ink);padding:9px 16px;border-radius:var(--r-md);box-shadow:var(--shadow-2);font-size:13px;z-index:200;opacity:0;pointer-events:none;transition:var(--t)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.deny{border-color:var(--cinnabar);color:var(--cinnabar)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="seal" role="img" aria-label="墨子印"><svg width="34" height="34" viewBox="0 0 100 100" role="img" aria-label="墨子印"><defs><radialGradient id="mzInniT" cx="42%" cy="35%" r="80%"><stop offset="0%" stop-color="#EA4E32"/><stop offset="52%" stop-color="#D6361F"/><stop offset="100%" stop-color="#AF2113"/></radialGradient><filter id="mzZuoT" x="-18%" y="-18%" width="136%" height="136%"><feTurbulence type="fractalNoise" baseFrequency="0.07 0.08" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs><path d="M20 6 L82 7 Q93 7 93 19 L94 80 Q94 92 80 92 L19 93 Q6 93 6 79 L6 20 Q7 6 20 6 Z" fill="url(#mzInniT)" filter="url(#mzZuoT)"/><g fill="#F6F1E7" transform="translate(25.25,12.72) scale(0.073)"><g transform="translate(-173,805) scale(1,-1)"><path d="M542 745Q561 743 561 741L565 743H567Q568 743 573 739Q574 743 577 743Q578 739 581 739Q582 743 585 743H594V739Q598 739 602 741L606 739L610 741L620 739Q621 743 624 743Q635 739 635 736L645 739Q649 739 657 734Q658 739 661 739Q704 722 717 687Q715 683 715 681Q724 681 729 611Q721 549 705 549Q705 542 692 537Q684 518 674 518Q674 520 672 520Q656 511 604 504L600 506L596 504Q592 506 589 506L585 504Q581 506 579 506Q566 502 561 502H550L546 504Q542 497 542 493L544 489Q540 477 538 477Q538 442 550 427Q550 422 612 374Q672 335 694 316L750 287Q754 281 775 275Q778 266 787 257L785 252L791 248Q791 225 758 217Q740 217 721 240Q723 240 723 242Q649 280 589 322Q565 332 526 370L513 372Q511 361 484 353Q461 331 439 324Q439 321 420 310Q420 304 408 300Q408 294 377 277Q324 234 303 234Q303 225 266 197Q266 191 262 191Q260 191 260 193L256 191H252L245 195Q245 193 243 193Q235 206 233 230Q245 252 247 252Q262 265 307 289Q318 301 357 318Q421 364 423 368Q476 405 488 444Q488 449 493 460Q493 463 491 467L495 489Q493 502 491 502Q465 502 443 506Q441 506 441 504L427 506H420Q416 506 412 504Q409 506 404 506Q402 506 398 504Q361 514 355 530Q340 548 332 582Q332 595 328 613Q328 646 352 697Q352 717 388 726L390 722Q407 734 439 734Q439 732 441 732Q442 736 445 736L458 734Q461 736 466 736Q466 732 470 732H472Q472 739 476 739H478Q480 739 480 736Q494 739 499 743Q505 743 513 741Q539 743 542 745ZM550 687Q550 681 548 681Q550 677 550 675L548 671L552 662Q548 655 548 646V644Q554 636 554 631Q550 629 548 629L550 625Q550 621 546 611Q550 604 550 601Q550 598 548 594Q548 592 550 588Q549 557 546 557Q548 553 548 551L552 553Q554 553 554 551Q558 553 561 553L575 551Q579 553 583 553Q583 551 585 551Q586 555 589 555H604Q587 624 583 660V671L581 675Q585 675 585 679V689H581Q571 689 550 687ZM462 687Q460 677 458 677L460 666V664Q460 657 458 654L460 642V633Q460 629 458 625Q458 623 460 623Q458 609 455 609L458 605Q455 576 453 574Q453 572 455 572L453 561V557Q453 553 484 549Q488 551 491 551V603L488 623H491L488 627V642Q488 656 484 656L486 666V683Q486 687 482 687H474L464 685Q464 687 462 687ZM635 683 633 679V677Q637 647 637 644V638Q637 630 635 619Q643 607 643 601L641 596Q646 596 655 568H657Q667 568 678 592Q682 613 684 613L680 623L682 627Q682 681 647 681Q647 683 635 683ZM394 679Q379 644 379 607Q379 568 406 555V557L414 594L412 598Q414 605 416 605L414 609Q414 611 416 611L414 615Q418 630 418 633Q418 643 414 681ZM441 475Q460 456 460 446Q416 397 388 397Q362 381 313 362Q300 362 280 374Q277 374 274 386Q278 386 280 411L400 467Q416 473 441 475ZM639 473Q662 465 692 448L727 430Q758 414 758 401L760 376Q760 370 744 360H740Q709 360 622 417Q616 425 608 446Q608 455 620 458Q628 473 639 473ZM526 341Q531 331 542 320Q540 316 538 294Q540 286 540 277Q540 275 538 275Q540 271 540 269L538 265Q540 261 540 259Q536 252 536 248Q536 218 550 211Q615 159 692 112Q771 44 773 38Q773 32 777 32Q777 -3 750 -3Q738 -3 705 34Q702 34 661 73L544 145Q528 162 515 168Q504 154 488 147L412 88Q412 81 392 75Q387 60 367 53Q301 -9 293 -24L289 -22H287Q276 -32 266 -34Q252 -19 252 -11Q249 -3 249 3H252L249 7Q260 29 309 63Q323 78 350 96Q421 165 478 207L486 226Q482 271 482 281L486 283L484 287Q484 289 486 289L484 294V300Q484 304 486 308Q482 316 482 324Q493 337 497 337Q501 335 503 335Q503 339 526 341ZM439 273Q466 255 466 252V250Q466 234 420 199L344 135L317 125H313L301 139Q303 143 303 145Q299 145 297 158Q402 269 425 269Q426 269 439 273ZM608 271Q659 237 661 232Q675 228 699 207Q727 197 727 172L725 168Q727 164 727 160V156Q727 149 703 143Q692 143 629 193Q629 197 596 213Q577 232 577 236Q577 263 596 263Q596 267 608 271ZM513 121Q530 116 530 114L534 116H540Q543 116 546 110Q542 56 542 44L546 42H548Q589 42 602 38L606 40Q633 34 633 26Q631 26 631 24Q642 24 645 3Q627 -15 616 -15H594L581 -13Q578 -15 571 -15H569Q567 -15 567 -13L563 -15H558Q554 -15 550 -13L538 -17Q538 -22 540 -22L538 -46V-59L536 -63Q549 -69 561 -69Q564 -69 579 -65Q579 -67 581 -67L583 -63L596 -69Q596 -66 608 -63Q609 -67 612 -67H618Q623 -63 626 -63L637 -65V-59H643Q647 -59 647 -63L666 -59Q666 -61 668 -61Q668 -57 672 -57L678 -61Q679 -57 682 -57Q711 -74 711 -92V-94Q711 -120 670 -127Q629 -122 629 -118Q626 -118 626 -120L606 -118H602Q598 -119 598 -123Q575 -119 575 -116Q571 -118 552 -120L548 -118Q533 -123 532 -123V-120Q528 -123 526 -123Q519 -123 466 -125V-123Q461 -125 439 -127Q435 -125 433 -125Q429 -127 427 -127L423 -125Q419 -127 416 -127L412 -125Q400 -129 396 -129L385 -127Q381 -127 377 -129Q366 -127 359 -127H340Q335 -127 330 -96Q342 -69 355 -69Q362 -67 375 -67L385 -69Q389 -67 392 -67L404 -69Q411 -65 416 -65H423Q440 -65 460 -67L476 -63Q477 -67 480 -67L491 -65V-61Q491 -52 488 -44Q491 -37 491 -36Q491 -17 482 -17Q480 -17 480 -20Q473 -17 472 -17Q445 -17 427 -22Q425 -22 425 -20L414 -22H406Q396 -18 390 5Q398 27 420 40Q423 40 427 38L468 42L472 40Q483 44 488 51V77Q488 111 513 121Z"/></g></g></svg></span>
+      <b data-i18n="墨子">墨子</b><span class="sub">Mozi</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="modelwrap">
+      <button class="kbtn" id="langBtn" onclick="toggleLangMenu(event)" aria-label="语言">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg>
+        <span id="langLbl">简体</span>
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="modelmenu" id="langMenu">
+        <div class="mm-item" data-lang="zh" onclick="setLang('zh')"><span class="ck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><span class="nm">简体中文</span></div>
+        <div class="mm-item" data-lang="hant" onclick="setLang('hant')"><span class="ck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><span class="nm">繁體中文</span></div>
+        <div class="mm-item" data-lang="en" onclick="setLang('en')"><span class="ck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><span class="nm">English</span></div>
+      </div>
+    </div>
+    <div class="modelwrap">
+      <button class="kbtn" id="tourBtn" onclick="toggleTourMenu(event)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 5v14l11-7z"/></svg> <span data-i18n="演示导览">演示导览</span> <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="modelmenu" id="tourMenu">
+        <div class="mm-group" data-i18n="演示导览">演示导览</div>
+        <div class="mm-item" onclick="tourStart('all')"><span class="nm" data-i18n="全链路打通">全链路打通</span><span class="tg" data-i18n="4 项">4 项</span></div>
+        <div class="mm-item" onclick="tourStart('kb')"><span class="nm" data-i18n="知识闭环 · 库×图">知识闭环 · 库×图</span><span class="tg">loop</span></div>
+      </div>
+    </div>
+    <button class="kbtn" id="cmdkBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg> <span data-i18n="搜索">搜索</span> <kbd>⌘K</kbd></button>
+    <button class="iconbtn" id="themeBtn" aria-label="切换主题">
+      <svg id="thIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </header>
+
+  <!-- RAIL -->
+  <nav class="rail" id="rail"></nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- CHAT -->
+    <section class="surface active" data-surface="chat">
+      <div class="chat-scroll">
+        <div class="chat-wrap">
+          <div class="surface-head" style="padding:0 0 10px"><h1 data-i18n="对答">对答</h1><span class="hint" data-i18n="SSE 流式 · 思维链 · 智能上下文注入">SSE 流式 · 思维链 · 智能上下文注入</span><button class="cw-entry" style="margin-left:auto" onclick="cwFrom('chat','升级为协同任务')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="18" cy="9" r="2"/><path d="M14.5 20a4 4 0 0 1 6.5-3"/></svg><span data-i18n="升级为协同">升级为协同</span></button></div>
+          <div id="chatMsgs">
+            <div class="msg user"><div class="role">user</div><div class="bubble" data-i18n="墨子用什么做本地检索？">墨子用什么做本地检索？</div></div>
+            <div class="msg bot">
+              <div class="role">assistant · DeepSeek-V4-Pro</div>
+              <details class="reasoning"><summary data-i18n="思维链 · 3 步">思维链 · 3 步</summary><span data-i18n="检索 Vault → 命中分块 → 综合多路结果作答…">检索 Vault → 命中分块 → 综合多路结果作答…</span></details>
+              <div class="bubble">
+                <span data-i18n="chat.answer">墨子的本地检索是<b>多路融合</b>：稠密向量 (BGE-M3 / sqlite-vec) + BM25 + FTS5，命中分块按 score 加权。归档时自动分块、向量化并抽取 KG 三元组。</span>
+                <div class="codeblock"><span class="cm" data-i18n="# 多路检索"># 多路检索</span><br><span class="kw">res</span> = retrieval.<span class="fn">search</span>(conn, uid, q, routes=[<span class="st">"dense"</span>,<span class="st">"bm25"</span>,<span class="st">"fts"</span>])</div>
+                <div class="ground">
+                  <div class="gh" data-i18n="接地引用 · 点击跳知识库">接地引用 · 点击跳知识库</div>
+                  <div class="hitcard" onclick="go('vault')"><div class="t" data-i18n="墨子检索架构 · 0.842">墨子检索架构 · 0.842</div><div class="src" data-i18n="出处 retrieval.py · chunk_3 · 路 dense+bm25">出处 retrieval.py · chunk_3 · 路 dense+bm25</div></div>
+                  <div class="hitcard" onclick="go('vault')"><div class="t" data-i18n="向量索引选型 · 0.771">向量索引选型 · 0.771</div><div class="src" data-i18n="出处 vector_index.py · chunk_1 · 路 dense">出处 vector_index.py · chunk_1 · 路 dense</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-composer">
+        <div class="cw-comp-row">
+          <div class="modelwrap chat-model">
+            <button class="pill" id="modelBtn" onclick="toggleModelMenu(event)" aria-label="切换模型">
+              <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 9h6v6H9zM2 10h2M2 14h2M20 10h2M20 14h2M10 2v2M14 2v2M10 20v2M14 20v2"/></svg></span>
+              <span id="modelLbl">自动 (UMA)</span>
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="modelmenu up" id="modelMenu"></div>
+          </div>
+          <textarea class="cw-input" id="chatInput" rows="1" data-i18n-ph="问点什么…" placeholder="问点什么…"></textarea>
+          <button class="cw-cbtn cw-csend" id="chatSendBtn" onclick="chatSend()" title="发送"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VAULT -->
+    <section class="surface" data-surface="vault">
+      <div class="vault-toolbar">
+        <div class="seg"><button class="on" id="vbTime" onclick="vaultView('timeline')" data-i18n="时间轴">时间轴</button><button id="vbList" onclick="vaultView('list')" data-i18n="列表">列表</button></div>
+        <input class="mini-input" id="vaultQ" data-i18n-ph="混合检索 dense/bm25/fts…" placeholder="混合检索 dense/bm25/fts…" style="width:230px">
+        <span class="chip celadon">⌘K</span>
+        <span class="chip gold" id="vaultViewHint" data-i18n="Notion 式时间序列看板 · 今天 6/27" style="display:inline-flex">Notion 式时间序列看板 · 今天 6/27</span>
+      </div>
+      <div class="vault-body">
+        <div class="vault-grid" id="vaultListMode" style="display:none">
+          <div class="vault-list"><div id="docList"></div></div>
+          <div class="vault-detail" id="vaultDetail"></div>
+        </div>
+        <div class="vault-tl" id="vaultTimeMode" style="display:block"></div>
+      </div>
+    </section>
+
+    <!-- GRAPH -->
+    <section class="surface" data-surface="graph">
+      <div class="graph-grid">
+        <div class="graph-toolbar">
+          <div class="seg"><button class="on" id="segGlobal" onclick="graphView('global')" data-i18n="全局图">全局图</button><button id="segLocal" onclick="graphView('local')" data-i18n="局部图">局部图</button></div>
+          <input class="mini-input" id="graphSearch" data-i18n-ph="实体名 (回车定位)" placeholder="实体名 (回车定位)" style="width:160px">
+          <span class="chip"><span data-i18n="跳数">跳数</span>
+            <select id="hops" class="mini-input" style="padding:1px 4px;margin-left:4px"><option>1</option><option selected>2</option><option>3</option></select>
+          </span>
+          <span class="chip celadon" id="graphCount">18 实体 / 18 关系</span>
+          <span class="chip gold" data-i18n="自研 Verlet · 零依赖">自研 Verlet · 零依赖</span>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="graphCanvas"></canvas>
+          <div class="legend" id="legend"></div>
+        </div>
+        <aside class="graph-side">
+          <h3 id="nodeTitle" data-i18n="点选节点查看邻域">点选节点查看邻域</h3>
+          <div id="nodeMeta" class="muted" style="margin-bottom:8px"></div>
+          <div id="adjList"></div>
+          <div class="a11y-note" data-i18n="graph.a11y"><b>无障碍 fallback (等级 D)</b><br>三元组邻接表与图谱并存，键盘可达，图谱永不作唯一表示。</div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- COWORK · 与同事(人类)协同 [前台] + 智能体工作台 [后台] -->
+    <section class="surface" data-surface="cowork">
+      <!-- 左:协作同事(人类) + 频道 -->
+      <aside class="cw-side">
+        <div class="cw-side-sec">
+          <div class="cw-side-h"><span data-i18n="协作同事">协作同事</span><span class="cw-presence-sum" id="cwTeamSum">—</span></div>
+          <div id="cwMates"></div>
+        </div>
+        <div class="cw-side-sec">
+          <div class="cw-side-h"><span data-i18n="频道">频道</span><button class="cw-newbtn" id="cwNewBtn" title="新频道">＋</button></div>
+          <div id="cwSessions"></div>
+        </div>
+      </aside>
+
+      <!-- 中:频道头 + 人类协同流 + composer -->
+      <div class="cw-main">
+        <div class="cw-chan-head">
+          <div class="cw-chan-title">#&nbsp;<span id="cwChanName" data-i18n="出网审计合规说明">出网审计合规说明</span></div>
+          <div class="cw-chan-meta">
+            <span class="cw-members" id="cwMembers"></span>
+            <button class="cw-inspect" id="cwInspectBtn" onclick="openInspector()" title="查看智能体协同工作状态">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2M9.5 13h.01M14.5 13h.01M10 16h4"/></svg>
+              <span data-i18n="智能体工作台">智能体工作台</span></button>
+          </div>
+        </div>
+        <div class="cw-stream" id="cwStream"></div>
+        <div class="cw-composer">
+          <div class="cw-comp-tools">
+            <button class="cw-cbtn" id="cwAt" title="@ 提及同事 / 助手">@</button>
+            <button class="cw-cbtn" id="cwAttach" title="附件 (信创沙箱)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 6"/></svg></button>
+          </div>
+          <div class="cw-comp-row">
+            <textarea class="cw-input" id="cwInput" rows="1" data-i18n-ph="给同事留言,或 @墨子助手 交办任务…" placeholder="给同事留言,或 @墨子助手 交办任务…"></textarea>
+            <button class="cw-cbtn cw-csend" id="cwSendBtn" onclick="cwSendHuman()" title="发送"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+            <button class="runbtn cw-send" id="coworkRun" onclick="runCowork()" data-i18n="交给助手">交给助手</button>
+          </div>
+          <div class="cw-comp-hint"><kbd>Enter</kbd> <span data-i18n="发送">发送</span> · <span data-i18n="@墨子助手 交办">@墨子助手 交办</span> · <kbd>⌘K</kbd> <span data-i18n="命令面板">命令面板</span></div>
+        </div>
+      </div>
+
+      <!-- 右:关联 + 产物(协同成果, 前台) -->
+      <aside class="cw-receipt">
+        <div class="cw-r-sec">
+          <h3><span class="seal-dot" style="background:var(--gold)"></span><span data-i18n="关联">关联</span></h3>
+          <div id="cwLinks" class="cw-links"></div>
+        </div>
+        <div class="cw-r-sec" id="cwArtifactSec" style="display:none">
+          <h3><span class="seal-dot" style="background:var(--cinnabar)"></span><span data-i18n="产物 · 写回">产物 · 写回</span></h3>
+          <div id="coworkOut" style="font-size:13px;line-height:1.6"></div>
+          <div class="cw-art-acts">
+            <button class="smallbtn" onclick="cwWriteback('vault')" data-i18n="归档知识库">归档知识库</button>
+            <button class="smallbtn" onclick="cwWriteback('graph')" data-i18n="回填图谱">回填图谱</button>
+            <button class="smallbtn" onclick="cwWriteback('code')" data-i18n="应用补丁">应用补丁</button>
+            <button class="smallbtn" onclick="runCowork()" data-i18n="重跑">重跑</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- peek 抽屉:就地预览 库/图/码 -->
+      <div class="cw-peek" id="cwPeek" hidden>
+        <div class="cw-peek-scrim" id="cwPeekScrim" onclick="closePeek()"></div>
+        <div class="cw-peek-panel">
+          <div class="cw-peek-head"><span id="cwPeekTitle">—</span><button class="cw-peek-x" id="cwPeekX" onclick="closePeek()" aria-label="关闭">✕</button></div>
+          <div class="cw-peek-body" id="cwPeekBody"></div>
+          <div class="cw-peek-foot"><button class="runbtn" id="cwPeekOpen" data-i18n="在表面中打开 →">在表面中打开 →</button></div>
+        </div>
+      </div>
+
+      <!-- 智能体工作台 抽屉:后台 observe→act (默认不打扰, 入口可调看) -->
+      <div class="cw-peek cw-inspector" id="cwInspector" hidden>
+        <div class="cw-peek-scrim" onclick="closeInspector()"></div>
+        <div class="cw-peek-panel">
+          <div class="cw-peek-head"><span data-i18n="智能体工作台 · observe→act">智能体工作台 · observe→act</span><button class="cw-peek-x" onclick="closeInspector()" aria-label="关闭">✕</button></div>
+          <div class="cw-peek-body">
+            <div class="cw-ins-note" data-i18n="ins.note">这是协同背后的多智能体后台:agent_loop 的 observe→act 步骤、可信回执与出网审计。前台只呈现你与同事的协同结果。</div>
+            <div class="cw-ins-team" id="cwAgents"></div>
+            <div class="cw-plan" id="cwPlan"></div>
+            <div class="cw-ins-stream" id="cwAgentStream"></div>
+            <div class="cw-ins-receipt">
+              <h4><span data-i18n="可信回执">可信回执</span></h4>
+              <div class="kv"><span data-i18n="选中模型">选中模型</span><span id="rcModel">—</span></div>
+              <div class="kv"><span data-i18n="模型">模型</span><span id="cwModel">自动 (UMA)</span></div>
+              <div class="kv"><span data-i18n="隐私">隐私</span><span id="cwPrivacy">local_first</span></div>
+              <div class="kv"><span data-i18n="步数">步数</span><span id="rcSteps">0</span></div>
+              <div class="kv"><span data-i18n="工具调用">工具调用</span><span id="rcTools">0</span></div>
+              <div class="kv"><span data-i18n="出网次数">出网次数</span><span id="rcEgress">0</span></div>
+              <div class="kv"><span data-i18n="成本">成本</span><span id="rcCost">¥0.000</span></div>
+              <h4 style="margin-top:12px"><span data-i18n="出网审计">出网审计</span></h4>
+              <div id="rcAudit" class="muted" style="font-size:11.5px" data-i18n="每步穿 sovereign 出网门 / allowed-tools 沙箱 / 配额硬上限。">每步穿 sovereign 出网门 / allowed-tools 沙箱 / 配额硬上限。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CODE · 编程 -->
+    <section class="surface" data-surface="code">
+      <div class="code-grid">
+        <div class="diff" id="codeDiff" style="grid-row:1;grid-column:1"></div>
+        <aside class="work-side" style="grid-row:1;grid-column:2;border-left:1px solid var(--line)">
+          <h3 data-i18n="过程 · agent_loop">过程 · agent_loop</h3>
+          <div id="codeProcess" class="muted" style="font-size:12px" data-i18n="复用 Cowork 步骤流引擎 (同一 SSE 桥)。">复用 Cowork 步骤流引擎 (同一 SSE 桥)。</div>
+        </aside>
+        <div class="code-composer" style="grid-row:2;grid-column:1/3">
+          <div class="cw-comp-row">
+            <textarea class="cw-input" id="codeInstr" rows="1" data-i18n-val="把 LRU 缓存改成线程安全">把 LRU 缓存改成线程安全</textarea>
+            <button class="cw-entry" onclick="cwFrom('code','交协同验证补丁')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="18" cy="9" r="2"/><path d="M14.5 20a4 4 0 0 1 6.5-3"/></svg><span data-i18n="交协同验证">交协同验证</span></button>
+            <button class="runbtn cw-iconbtn" id="codeRun" onclick="runCode()" title="发出 / 交付" aria-label="发出 / 交付"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V6M6 12l6-6 6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- STATUS -->
+  <footer class="status">
+    <span><span data-i18n="路由">路由</span> <span class="num" id="stModel">DeepSeek-V4-Pro</span></span>
+    <span><span data-i18n="本期">本期</span> <span class="num">12,480</span> tokens · <span class="num">¥0.037</span></span>
+    <span class="quota"><span data-i18n="配额">配额</span> <span class="bar"><div></div></span> <span class="num">34%</span></span>
+    <div class="spacer" style="flex:1"></div>
+    <span><i class="dot on"></i> <span data-i18n="已连接">已连接</span></span>
+  </footer>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div class="scrim" id="scrim">
+  <div class="palette" role="dialog" aria-modal="true">
+    <input id="paletteInput" data-i18n-ph="跳转表面 / 搜索文档、实体 / 执行动作…" placeholder="跳转表面 / 搜索文档、实体 / 执行动作…" autocomplete="off">
+    <div class="results" id="paletteResults"></div>
+  </div>
+</div>
+<!-- 演示导览 overlay -->
+<div id="tourRing" hidden></div>
+<div id="tourPanel" hidden>
+  <div class="tour-hd"><span class="tour-step" id="tourStep">1/7</span><span class="tour-title" id="tourTitle">—</span><button class="tour-x" onclick="tourEnd()" aria-label="退出导览">✕</button></div>
+  <div class="tour-body" id="tourBody"></div>
+  <div class="tour-check" id="tourCheck"></div>
+  <div class="tour-ctl"><button class="smallbtn" id="tourPrev" onclick="tourPrev()" data-i18n="上一步">上一步</button><button class="runbtn" id="tourNext" onclick="tourNext()" data-i18n="下一步">下一步</button></div>
+</div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+/* ============ i18n (简/繁/EN) ============ */
+let LANG='zh';const LIDX=()=>({zh:0,hant:1,en:2}[LANG]);
+const MAP={
+ "墨子":["墨子","墨子","Mozi"],"Mozi · 本地优先":["Mozi · 本地优先","Mozi · 本地優先","Mozi · Local-first"],
+ "搜索":["搜索","搜尋","Search"],"对答":["对答","對答","Chat"],"知识库":["知识库","知識庫","Vault"],
+ "图谱":["图谱","圖譜","Graph"],"协同":["协同","協同","Cowork"],"编码":["编程","編程","Code"],"设置":["设置","設定","Settings"],
+ "本地优先 · 零外呼":["本地优先 · 零外呼","本地優先 · 零外呼","Local-first · No egress"],
+ "主权模式 · 仅国产出网":["主权模式 · 仅国产出网","主權模式 · 僅國產出網","Sovereign · Domestic only"],
+ "自动 (UMA)":["自动 (UMA)","自動 (UMA)","Auto (UMA)"],
+ "SSE 流式 · 思维链 · 智能上下文注入":["SSE 流式 · 思维链 · 智能上下文注入","SSE 串流 · 思維鏈 · 智能上下文注入","SSE streaming · reasoning · context injection"],
+ "墨子用什么做本地检索？":["墨子用什么做本地检索？","墨子用什麼做本地檢索？","What does Mozi use for local retrieval?"],
+ "思维链 · 3 步":["思维链 · 3 步","思維鏈 · 3 步","Reasoning · 3 steps"],
+ "检索 Vault → 命中分块 → 综合多路结果作答…":["检索 Vault → 命中分块 → 综合多路结果作答…","檢索 Vault → 命中分塊 → 綜合多路結果作答…","Search Vault → hit chunks → synthesize a multi-route answer…"],
+ "chat.answer":['墨子的本地检索是<b>多路融合</b>：稠密向量 (BGE-M3 / sqlite-vec) + BM25 + FTS5，命中分块按 score 加权。归档时自动分块、向量化并抽取 KG 三元组。','墨子的本地檢索是<b>多路融合</b>：稠密向量 (BGE-M3 / sqlite-vec) + BM25 + FTS5，命中分塊按 score 加權。歸檔時自動分塊、向量化並抽取 KG 三元組。','Mozi’s local retrieval is <b>multi-route fusion</b>: dense vectors (BGE-M3 / sqlite-vec) + BM25 + FTS5, hit chunks weighted by score. On archive it auto-chunks, embeds, and extracts KG triples.'],
+ "# 多路检索":["# 多路检索","# 多路檢索","# multi-route retrieval"],
+ "接地引用 · 点击跳知识库":["接地引用 · 点击跳知识库","接地引用 · 點擊跳知識庫","Grounding · click to open Vault"],
+ "墨子检索架构 · 0.842":["墨子检索架构 · 0.842","墨子檢索架構 · 0.842","Mozi retrieval architecture · 0.842"],
+ "出处 retrieval.py · chunk_3 · 路 dense+bm25":["出处 retrieval.py · chunk_3 · 路 dense+bm25","來源 retrieval.py · chunk_3 · 路 dense+bm25","src retrieval.py · chunk_3 · via dense+bm25"],
+ "向量索引选型 · 0.771":["向量索引选型 · 0.771","向量索引選型 · 0.771","Vector index choice · 0.771"],
+ "出处 vector_index.py · chunk_1 · 路 dense":["出处 vector_index.py · chunk_1 · 路 dense","來源 vector_index.py · chunk_1 · 路 dense","src vector_index.py · chunk_1 · via dense"],
+ "列表":["列表","清單","List"],"时间轴":["时间轴","時間軸","Timeline"],
+ "混合检索 dense/bm25/fts…":["混合检索 dense/bm25/fts…","混合檢索 dense/bm25/fts…","Hybrid search dense/bm25/fts…"],
+ "Notion 式时间序列看板 · 今天 6/27":["Notion 式时间序列看板 · 今天 6/27","Notion 式時間序列看板 · 今天 6/27","Notion-style timeline board · Today Jun 27"],
+ "全局图":["全局图","全局圖","Global"],"局部图":["局部图","局部圖","Local"],
+ "实体名 (回车定位)":["实体名 (回车定位)","實體名 (Enter 定位)","Entity name (Enter to locate)"],
+ "跳数":["跳数","跳數","Hops"],"14 实体 / 18 关系":["14 实体 / 18 关系","14 實體 / 18 關係","14 entities / 18 edges"],
+ "自研 Verlet · 零依赖":["自研 Verlet · 零依赖","自研 Verlet · 零依賴","Self-built Verlet · zero-dep"],
+ "点选节点查看邻域":["点选节点查看邻域","點選節點查看鄰域","Select a node to see its neighborhood"],
+ "邻接关系":["邻接关系","鄰接關係","Adjacency"],
+ "graph.a11y":['<b>无障碍 fallback (等级 D)</b><br>三元组邻接表与图谱并存，键盘可达，图谱永不作唯一表示。','<b>無障礙 fallback (等級 D)</b><br>三元組鄰接表與圖譜並存，鍵盤可達，圖譜永不作唯一表示。','<b>A11y fallback (level D)</b><br>The triple adjacency list coexists with the graph, is keyboard-reachable, and the graph is never the sole representation.'],
+ "平台":["平台","平台","Platform"],"网关":["网关","網關","Gateway"],"模块":["模块","模組","Module"],"存储":["存储","儲存","Storage"],"模型":["模型","模型","Model"],"概念":["概念","概念","Concept"],"技术":["技术","技術","Tech"],"引擎":["引擎","引擎","Engine"],
+ "UMA网关":["UMA网关","UMA網關","UMA Gateway"],"豆包推理":["豆包推理","豆包推理","Doubao"],"向量索引":["向量索引","向量索引","Vector Index"],"天青设计":["天青设计","天青設計","Celadon Design"],
+ "使用":["使用","使用","uses"],"包含":["包含","包含","contains"],"路由":["路由","路由","routes"],"驱动":["驱动","驅動","drives"],"调用":["调用","調用","calls"],"依赖":["依赖","依賴","depends on"],"抽取":["抽取","抽取","extracts"],"存于":["存于","存於","stored in"],"遵循":["遵循","遵循","follows"],"查询":["查询","查詢","queries"],
+ "审计":["审计","審計","audits"],"拒绝":["拒绝","拒絕","denies"],"挂载":["挂载","掛載","mounts"],"复用":["复用","複用","reuses"],"透传":["透传","透傳","streams"],"扩展":["扩展","擴展","extends"],"发现":["发现","發現","finds"],"落地":["落地","落地","lands"],
+ "非国产模型":["非国产模型","非國產模型","non-domestic models"],"外壳":["外壳","外殼","Shell"],"四表面":["四表面","四表面","four surfaces"],"墨韵":["墨韵","墨韻","Mo-Yun"],"SSE 桥":["SSE 桥","SSE 橋","SSE bridge"],
+ "调研墨子的出网审计机制并归档":["调研墨子的出网审计机制并归档","調研墨子的出網審計機制並歸檔","Research Mozi’s egress audit mechanism and archive it"],
+ "运行":["运行","運行","Run"],"运行中…":["运行中…","運行中…","Running…"],
+ "点「运行」观察 agent observe→act 实时步骤流 (SSE 桥)。":["点「运行」观察 agent observe→act 实时步骤流 (SSE 桥)。","點「運行」觀察 agent observe→act 即時步驟流 (SSE 橋)。","Click “Run” to watch the agent’s observe→act live step stream (SSE bridge)."],
+ "可信回执":["可信回执","可信回執","Trust receipt"],"选中模型":["选中模型","選中模型","Model"],"步数":["步数","步數","Steps"],"工具调用":["工具调用","工具調用","Tool calls"],"出网次数":["出网次数","出網次數","Egress count"],"成本":["成本","成本","Cost"],"出网审计":["出网审计","出網審計","Egress audit"],
+ "每步穿 sovereign 出网门 / allowed-tools 沙箱 / 配额硬上限。":["每步穿 sovereign 出网门 / allowed-tools 沙箱 / 配额硬上限。","每步穿 sovereign 出網門 / allowed-tools 沙箱 / 配額硬上限。","Each step passes the sovereign egress gate / allowed-tools sandbox / quota hard cap."],
+ "每步穿 egress 出网门 / allowed-tools 沙箱 / 配额硬上限。":["每步穿 egress 出网门 / allowed-tools 沙箱 / 配额硬上限。","每步穿 egress 出網門 / allowed-tools 沙箱 / 配額硬上限。","Each step passes the egress gate / allowed-tools sandbox / quota hard cap."],
+ "产物":["产物","產物","Artifact"],"归档知识库":["归档知识库","歸檔知識庫","Archive to Vault"],"引图谱":["引图谱","引圖譜","Cite in Graph"],"重跑":["重跑","重跑","Re-run"],
+ "目标：调研出网审计。先检索本地 Vault…":["目标：调研出网审计。先检索本地 Vault…","目標：調研出網審計。先檢索本地 Vault…","Goal: research egress audit. First search the local Vault…"],
+ "命中 2 块 · 出网审计机制 (0.88) · egress 唯一门 (0.79)":["命中 2 块 · 出网审计机制 (0.88) · egress 唯一门 (0.79)","命中 2 塊 · 出網審計機制 (0.88) · egress 唯一門 (0.79)","2 hits · Egress audit mechanism (0.88) · single egress gate (0.79)"],
+ "补一条外部佐证，联网搜索 (keyless, 国产白名单)…":["补一条外部佐证，联网搜索 (keyless, 国产白名单)…","補一條外部佐證，聯網搜尋 (keyless, 國產白名單)…","Add an external citation via web search (keyless, domestic allowlist)…"],
+ "信创 egress 数据主权":["信创 egress 数据主权","信創 egress 數據主權","trusted-stack egress data sovereignty"],
+ "3 条联网结果 · web_search 经 egress 门审计·放行 (国产白名单)":["3 条联网结果 · web_search 经 egress 门审计·放行 (国产白名单)","3 條聯網結果 · web_search 經 egress 門審計·放行 (國產白名單)","3 web results · web_search audited & allowed by the egress gate (domestic allowlist)"],
+ "想用海外模型 Claude 交叉复核结论…":["想用海外模型 Claude 交叉复核结论…","想用海外模型 Claude 交叉複核結論…","Try to cross-check with the overseas model Claude…"],
+ "✕ 出网被拒 · provider=anthropic · 主权模式禁止非国产 provider 出网 (零字节出网)":["✕ 出网被拒 · provider=anthropic · 主权模式禁止非国产 provider 出网 (零字节出网)","✕ 出網被拒 · provider=anthropic · 主權模式禁止非國產 provider 出網 (零位元組出網)","✕ Egress denied · provider=anthropic · sovereign mode blocks non-domestic providers (zero bytes out)"],
+ "非国产被拒，回落国产模型综合。":["非国产被拒，回落国产模型综合。","非國產被拒，回落國產模型綜合。","Overseas denied; fall back to domestic models to synthesize."],
+ "本地优先：资料充分，国产模型直接综合。":["本地优先：资料充分，国产模型直接综合。","本地優先：資料充分，國產模型直接綜合。","Local-first: enough material; synthesize directly with domestic models."],
+ "综合完成，产物就绪。":["综合完成，产物就绪。","綜合完成，產物就緒。","Synthesis complete; artifact ready."],
+ "lab.reasoning":["reasoning · 思维链","reasoning · 思維鏈","reasoning"],"lab.final":["step · final","step · final","step · final"],
+ "cowork.out.head":['墨子的出网审计以 <b>egress 唯一门</b>为核心：每次模型推理与工具外呼都过此门、写审计行；<b>主权模式</b>下非国产 provider 直接拒 (零字节出网)。','墨子的出網審計以 <b>egress 唯一門</b>為核心：每次模型推理與工具外呼都過此門、寫審計行；<b>主權模式</b>下非國產 provider 直接拒 (零位元組出網)。','Mozi’s egress audit centers on a <b>single egress gate</b>: every inference and tool call passes it and writes an audit row; under <b>sovereign mode</b> non-domestic providers are denied outright (zero bytes out).'],
+ "cowork.out.deny":['本轮尝试用海外模型 Claude 复核被 <b>egress 门</b>拒 (主权模式禁非国产 provider)，已回落国产模型综合。<span class="chip cinnabar" style="margin-left:6px">1 次非国产被拒</span>','本輪嘗試用海外模型 Claude 複核被 <b>egress 門</b>拒 (主權模式禁非國產 provider)，已回落國產模型綜合。<span class="chip cinnabar" style="margin-left:6px">1 次非國產被拒</span>','This run’s attempt to verify with Claude was denied by the <b>egress gate</b> (sovereign blocks non-domestic); fell back to domestic models. <span class="chip cinnabar" style="margin-left:6px">1 non-domestic denied</span>'],
+ "cowork.out.ok":['本地优先下国产模型 + keyless web_search (国产白名单) 均经 egress 门审计放行，零非国产外呼。<span class="chip celadon" style="margin-left:6px">0 次被拒</span>','本地優先下國產模型 + keyless web_search (國產白名單) 均經 egress 門審計放行，零非國產外呼。<span class="chip celadon" style="margin-left:6px">0 次被拒</span>','Under local-first, domestic models + keyless web_search all pass the egress gate; zero non-domestic egress. <span class="chip celadon" style="margin-left:6px">0 denied</span>'],
+ "egr.allow":["次出网·已审计放行","次出網·已審計放行","egress audited & allowed"],"egr.allowtail":[" (web_search 国产白名单)。"," (web_search 國產白名單)。"," (web_search domestic allowlist)."],
+ "egr.deny":["次非国产被拒","次非國產被拒","non-domestic denied"],"egr.denytail":[" (主权门, 零字节)。"," (主權門, 零位元組)。"," (sovereign gate, zero bytes)."],
+ "把 LRU 缓存改成线程安全":["把 LRU 缓存改成线程安全","把 LRU 快取改成執行緒安全","Make the LRU cache thread-safe"],"生成 diff":["生成 diff","生成 diff","Generate diff"],
+ "点「生成 diff」：agent 改代码 → 行级 diff (天青增 / 朱砂删) → 应用/拒绝。":["点「生成 diff」：agent 改代码 → 行级 diff (天青增 / 朱砂删) → 应用/拒绝。","點「生成 diff」：agent 改程式碼 → 行級 diff (天青增 / 朱砂刪) → 套用/拒絕。","Click “Generate diff”: the agent edits code → line-level diff (celadon add / cinnabar del) → apply/reject."],
+ "过程 · agent_loop":["过程 · agent_loop","過程 · agent_loop","Process · agent_loop"],
+ "复用 Cowork 步骤流引擎 (同一 SSE 桥)。":["复用 Cowork 步骤流引擎 (同一 SSE 桥)。","複用 Cowork 步驟流引擎 (同一 SSE 橋)。","Reuses the Cowork step-stream engine (same SSE bridge)."],
+ "读取选区上下文":["读取选区上下文","讀取選區上下文","read selection context"],"命中 1 块":["命中 1 块","命中 1 塊","1 hit"],"生成新版本 → 行级 diff":["生成新版本 → 行级 diff","生成新版本 → 行級 diff","generate new version → line-level diff"],
+ "路由":["路由","路由","Route"],"本期":["本期","本期","This period"],"配额":["配额","配額","Quota"],"已连接":["已连接","已連接","Connected"],
+ "跳转表面 / 搜索文档、实体 / 执行动作…":["跳转表面 / 搜索文档、实体 / 执行动作…","跳轉表面 / 搜尋文件、實體 / 執行動作…","Go to surface / search docs, entities / run actions…"],
+ "无匹配":["无匹配","無匹配","No matches"],"跳转表面":["跳转表面","跳轉表面","Go to surface"],"文档":["文档","文件","Documents"],"实体":["实体","實體","Entities"],"动作":["动作","動作","Actions"],"模型/隐私":["模型/隐私","模型/隱私","Model / Privacy"],
+ "打开对答":["打开对答","打開對答","Open Chat"],"打开知识库":["打开知识库","打開知識庫","Open Vault"],"打开图谱":["打开图谱","打開圖譜","Open Graph"],"打开协同":["打开协同","打開協同","Open Cowork"],"打开编码":["打开编程","打開編程","Open Code"],
+ "发起 Cowork 调研":["发起 Cowork 调研","發起 Cowork 調研","Start Cowork research"],"生成代码 diff":["生成代码 diff","生成程式碼 diff","Generate code diff"],
+ "知识库 · 切时间轴视图":["知识库 · 切时间轴视图","知識庫 · 切時間軸視圖","Vault · switch to timeline"],
+ "切换隐私 · 本地优先 ⇄ 主权模式":["切换隐私 · 本地优先 ⇄ 主权模式","切換隱私 · 本地優先 ⇄ 主權模式","Toggle privacy · Local-first ⇄ Sovereign"],
+ "模型 · 自动 (UMA)":["模型 · 自动 (UMA)","模型 · 自動 (UMA)","Model · Auto (UMA)"],"模型 · DeepSeek-V4-Pro":["模型 · DeepSeek-V4-Pro","模型 · DeepSeek-V4-Pro","Model · DeepSeek-V4-Pro"],"模型 · doubao-seed-evolving":["模型 · doubao-seed-evolving","模型 · doubao-seed-evolving","Model · doubao-seed-evolving"],
+ "墨子检索架构":["墨子检索架构","墨子檢索架構","Mozi retrieval architecture"],"出网审计机制":["出网审计机制","出網審計機制","Egress audit mechanism"],"豆包推理模型接入":["豆包推理模型接入","豆包推理模型接入","Doubao reasoning model integration"],
+ "前端蓝图 · 四表面与统一外壳":["前端蓝图 · 四表面与统一外壳","前端藍圖 · 四表面與統一外殼","Frontend blueprint · four surfaces + shell"],"知识图谱表面设计 (类 Obsidian)":["知识图谱表面设计 (类 Obsidian)","知識圖譜表面設計 (類 Obsidian)","Knowledge graph surface (Obsidian-style)"],
+ "Cowork SSE 桥契约":["Cowork SSE 桥契约","Cowork SSE 橋契約","Cowork SSE bridge contract"],"设计系统扩展 + 依赖裁决":["设计系统扩展 + 依赖裁决","設計系統擴展 + 依賴裁決","Design system extension + dependency verdict"],
+ "12 Epic 缺陷清单 (8B/17M/24m)":["12 Epic 缺陷清单 (8B/17M/24m)","12 Epic 缺陷清單 (8B/17M/24m)","12-Epic defect list (8B/17M/24m)"],"agent_loop 有界工具循环":["agent_loop 有界工具循环","agent_loop 有界工具循環","agent_loop bounded tool loop"],
+ "墨子 v3 全量执行交付报告 (12 Epic)":["墨子 v3 全量执行交付报告 (12 Epic)","墨子 v3 全量執行交付報告 (12 Epic)","Mozi v3 full execution report (12 Epic)"],
+ "笔记":["笔记","筆記","Note"],"交付":["交付","交付","Delivery"],"计划":["计划","計劃","Plan"],"评审":["评审","評審","Review"],"研究":["研究","研究","Research"],
+ "审查报告":["审查报告","審查報告","Audit report"],"交付报告":["交付报告","交付報告","Delivery report"],
+ "块":["块","塊","chunks"],"分块":["分块","分塊","chunks"],"检索 score":["检索 score","檢索 score","Retrieval score"],"抽取三元组":["抽取三元组","抽取三元組","Extracted triples"],"在图谱中查看 →":["在图谱中查看 →","在圖譜中查看 →","View in Graph →"],
+ "墨子的检索是多路融合：稠密向量、BM25、FTS5 三路命中后按 score 加权。":["墨子的检索是多路融合：稠密向量、BM25、FTS5 三路命中后按 score 加权。","墨子的檢索是多路融合：稠密向量、BM25、FTS5 三路命中後按 score 加權。","Mozi retrieval is multi-route fusion: dense vectors, BM25, FTS5; hits weighted by score."],
+ "归档时文本自动分块 (chunking)，每块向量化 (BGE-M3)，并经 LLM+正则抽取 KG 三元组。":["归档时文本自动分块 (chunking)，每块向量化 (BGE-M3)，并经 LLM+正则抽取 KG 三元组。","歸檔時文本自動分塊 (chunking)，每塊向量化 (BGE-M3)，並經 LLM+正則抽取 KG 三元組。","On archive, text is auto-chunked, each chunk embedded (BGE-M3), and KG triples extracted via LLM+regex."],
+ "检索注入受 inject_gate 门控：低于阈值不自动注入对话上下文。":["检索注入受 inject_gate 门控：低于阈值不自动注入对话上下文。","檢索注入受 inject_gate 門控：低於閾值不自動注入對話上下文。","Injection is gated by inject_gate: below threshold it isn’t auto-injected into chat context."],
+ "出处随每条 hit 返回 provenance，可深链回原文 chunk。":["出处随每条 hit 返回 provenance，可深链回原文 chunk。","來源隨每條 hit 返回 provenance，可深連回原文 chunk。","Each hit returns provenance, deep-linkable back to the source chunk."],
+ "egress 是唯一出网判定门：sovereign 隐私级下非国产模型直接拒绝，零字节出网。":["egress 是唯一出网判定门：sovereign 隐私级下非国产模型直接拒绝，零字节出网。","egress 是唯一出網判定門：sovereign 隱私級下非國產模型直接拒絕，零位元組出網。","egress is the single egress-decision gate: under sovereign, non-domestic models are denied outright, zero bytes out."],
+ "每次模型推理与 web_search 工具调用都写 egress 审计行。":["每次模型推理与 web_search 工具调用都写 egress 审计行。","每次模型推理與 web_search 工具調用都寫 egress 審計行。","Every model inference and web_search call writes an egress audit row."],
+ "agent_loop 每步调模型前先过 egress.classify 硬门。":["agent_loop 每步调模型前先过 egress.classify 硬门。","agent_loop 每步調模型前先過 egress.classify 硬門。","agent_loop passes egress.classify before each model call."],
+ "火山方舟豆包 doubao-seed-evolving，OpenAI 兼容 /chat/completions。":["火山方舟豆包 doubao-seed-evolving，OpenAI 兼容 /chat/completions。","火山方舟豆包 doubao-seed-evolving，OpenAI 相容 /chat/completions。","Volcano Ark Doubao doubao-seed-evolving, OpenAI-compatible /chat/completions."],
+ "reasoning_content 经 ReasoningDelta 事件与正文分流。":["reasoning_content 经 ReasoningDelta 事件与正文分流。","reasoning_content 經 ReasoningDelta 事件與正文分流。","reasoning_content is split from the body via ReasoningDelta events."],
+ "统一外壳 Mode Rail + Cmd/K + 状态条；四表面挂载契约。":["统一外壳 Mode Rail + Cmd/K + 状态条；四表面挂载契约。","統一外殼 Mode Rail + Cmd/K + 狀態條；四表面掛載契約。","Unified shell: Mode Rail + Cmd/K + status bar; four-surface mount contract."],
+ "蜂群 8 agent 设计 → 对抗评审 → 路线图。":["蜂群 8 agent 设计 → 对抗评审 → 路线图。","蜂群 8 agent 設計 → 對抗評審 → 路線圖。","Swarm: 8 agents design → adversarial review → roadmap."],
+ "自研 Verlet 力导向画布；≤100 SVG / 101-500 Canvas / >500 聚类 LOD。":["自研 Verlet 力导向画布；≤100 SVG / 101-500 Canvas / >500 聚类 LOD。","自研 Verlet 力導向畫布；≤100 SVG / 101-500 Canvas / >500 聚類 LOD。","Self-built Verlet force canvas; ≤100 SVG / 101-500 Canvas / >500 cluster LOD."],
+ "a11y 等级 D：三元组邻接表必并存。":["a11y 等级 D：三元组邻接表必并存。","a11y 等級 D：三元組鄰接表必並存。","A11y level D: the triple adjacency list must coexist."],
+ "新增 POST /v1/cowork/run (SSE) 透传 agent_loop 逐步事件。":["新增 POST /v1/cowork/run (SSE) 透传 agent_loop 逐步事件。","新增 POST /v1/cowork/run (SSE) 透傳 agent_loop 逐步事件。","Add POST /v1/cowork/run (SSE) to stream agent_loop step events."],
+ "复用 chat SSE 框架 + Last-Event-ID 尾态回放。":["复用 chat SSE 框架 + Last-Event-ID 尾态回放。","複用 chat SSE 框架 + Last-Event-ID 尾態回放。","Reuse the chat SSE framework + Last-Event-ID tail replay."],
+ "新增图谱/语法/步骤/diff/密度 token；六项能力全自研零依赖。":["新增图谱/语法/步骤/diff/密度 token；六项能力全自研零依赖。","新增圖譜/語法/步驟/diff/密度 token；六項能力全自研零依賴。","Add graph/syntax/step/diff/density tokens; six capabilities all self-built, zero-dep."],
+ "逃生口 CM6/Prism/Cytoscape 仅复杂度爆发懒加载。":["逃生口 CM6/Prism/Cytoscape 仅复杂度爆发懒加载。","逃生口 CM6/Prism/Cytoscape 僅複雜度爆發懶載入。","Escape hatches CM6/Prism/Cytoscape only lazy-load when complexity demands."],
+ "对抗评审 BLOCKER/MAJOR/MINOR 分级。":["对抗评审 BLOCKER/MAJOR/MINOR 分级。","對抗評審 BLOCKER/MAJOR/MINOR 分級。","Adversarial review graded BLOCKER/MAJOR/MINOR."],
+ "悬挂边 bug + agent_loop SSE 缺口 = P0。":["悬挂边 bug + agent_loop SSE 缺口 = P0。","懸掛邊 bug + agent_loop SSE 缺口 = P0。","Dangling-edge bug + agent_loop SSE gap = P0."],
+ "observe→act 迭代调工具，穿 sovereign 门 / 沙箱 / 配额硬上限。":["observe→act 迭代调工具，穿 sovereign 门 / 沙箱 / 配额硬上限。","observe→act 迭代調工具，穿 sovereign 門 / 沙箱 / 配額硬上限。","observe→act iterates tool calls through the sovereign gate / sandbox / quota hard cap."],
+ "逐步 yield tool_call/tool_result/egress_denied 子事件。":["逐步 yield tool_call/tool_result/egress_denied 子事件。","逐步 yield tool_call/tool_result/egress_denied 子事件。","Streams tool_call/tool_result/egress_denied sub-events."],
+ "12 epic 串行落地；基准、进度、验收。":["12 epic 串行落地；基准、进度、验收。","12 epic 串行落地；基準、進度、驗收。","12 epics landed serially; baselines, progress, acceptance."],
+ "已切模型":["已切模型","已切模型","Switched model"],
+ "已切主权模式 · 非国产 provider 禁止出网":["已切主权模式 · 非国产 provider 禁止出网","已切主權模式 · 非國產 provider 禁止出網","Switched to Sovereign · non-domestic providers blocked"],
+ "已切本地优先 · 零外呼默认":["已切本地优先 · 零外呼默认","已切本地優先 · 零外呼默認","Switched to Local-first · no-egress default"],
+ /* ===== COWORK 多智能体协同 新增文案 ===== */
+ "智能体团队":["智能体团队","智能體團隊","Agent team"],"会话":["会话","會話","Channels"],
+ "你":["你","你","You"],"UMA 路由":["UMA 路由","UMA 路由","UMA Router"],"检索员":["检索员","檢索員","Retriever"],"联网侦察":["联网侦察","聯網偵察","Web Scout"],"综合员":["综合员","綜合員","Synthesizer"],
+ "在场":["在场","在場","active"],"工作中":["工作中","工作中","working"],"已交付":["已交付","已交付","delivered"],"待命":["待命","待命","idle"],
+ "调研出网审计机制并归档":["调研出网审计机制并归档","調研出網審計機制並歸檔","Research & archive the egress-audit mechanism"],
+ "前端蓝图 · 五表面评审":["前端蓝图 · 五表面评审","前端藍圖 · 五表面評審","Frontend blueprint · five-surface review"],
+ "知识图谱表面设计":["知识图谱表面设计","知識圖譜表面設計","Knowledge-graph surface design"],
+ "演示会话 · 切回 #调研出网审计 可运行":["演示会话 · 切回 #调研出网审计 可运行","示範會話 · 切回 #調研出網審計 可執行","Demo channel · switch back to #egress-audit to run"],
+ "检索本地 Vault":["检索本地 Vault","檢索本地 Vault","Search local Vault"],"联网佐证(经门)":["联网佐证(经门)","聯網佐證(經門)","Web evidence (gated)"],"交叉复核":["交叉复核","交叉複核","Cross-check"],"综合归档":["综合归档","綜合歸檔","Synthesize & archive"],
+ "团队待命中":["团队待命中","團隊待命中","Team on standby"],
+ "cw.empty":["点「运行」或在下方布置任务，观察多智能体 observe→act 协作：每步穿出网门、可信回执实时封存。","點「運行」或在下方佈置任務，觀察多智能體 observe→act 協作：每步穿出網門、可信回執即時封存。","Hit “Run” or assign a task below and watch the multi-agent team observe→act — every step passes the egress gate, with a live trust receipt."],
+ "添加反应":["添加反应","新增反應","Add reaction"],"反应已记录(演示)":["反应已记录(演示)","反應已記錄(示範)","Reaction noted (demo)"],
+ "条细节":["条细节","條細節","details"],"多路命中明细":["多路命中明细","多路命中明細","Multi-route hits"],"查看引用":["查看引用","查看引用","View citations"],
+ "出网审计机制 · 0.88":["出网审计机制 · 0.88","出網審計機制 · 0.88","Egress-audit mechanism · 0.88"],"egress 唯一门 · 0.79":["egress 唯一门 · 0.79","egress 唯一門 · 0.79","single egress gate · 0.79"],"audit_log 写入 · 0.74":["audit_log 写入 · 0.74","audit_log 寫入 · 0.74","audit_log write · 0.74"],
+ "已注入 2 处来源 · provenance":["已注入 2 处来源 · provenance","已注入 2 處來源 · provenance","Injected 2 sources · provenance"],
+ "egress · model.infer/web_search 已写审计行":["egress · web_search 已写审计行","egress · web_search 已寫審計行","egress · web_search audit row written"],
+ "出网审计机制 · chunk_1 (本地)":["出网审计机制 · chunk_1 (本地)","出網審計機制 · chunk_1 (本地)","Egress-audit mechanism · chunk_1 (local)"],
+ "本地 Vault · 综合(海外被拒)":["本地 Vault · 综合(海外被拒)","本地 Vault · 綜合(海外被拒)","Local Vault · synthesized (overseas denied)"],
+ "web · 信创 egress 数据主权(已审计)":["web · 信创 egress 数据主权(已审计)","web · 信創 egress 數據主權(已審計)","web · trusted-stack egress sovereignty (audited)"],
+ "cw.uma.assign":["拆解任务 → 择优分派。{r} 先查本地 Vault，{s} 备一条联网佐证，{y} 待命综合。","拆解任務 → 擇優分派。{r} 先查本地 Vault，{s} 備一條聯網佐證，{y} 待命綜合。","Breaking the task down → assigning. {r} search the local Vault first, {s} stand by for one web citation, {y} prepare to synthesize."],
+ "cw.retr.start":["正在多路检索本地 Vault（dense + bm25 + fts5）…","正在多路檢索本地 Vault（dense + bm25 + fts5）…","Running multi-route search over the local Vault (dense + bm25 + fts5)…"],
+ "cw.retr.handoff":["本地资料就绪，已注入上下文。{s} 可补一条外部佐证；{y} 准备综合。","本地資料就緒，已注入上下文。{s} 可補一條外部佐證；{y} 準備綜合。","Local material ready and injected. {s} may add an external citation; {y} prepare to synthesize."],
+ "cw.scout.need":["本地资料偏内部，想出网取一条信创佐证——这一步会触发出网门，需你批准。","本地資料偏內部，想出網取一條信創佐證——這一步會觸發出網門，需你批准。","Local material is mostly internal; I'd like to fetch one external citation — this trips the egress gate and needs your approval."],
+ "cw.scout.hitlbody":["请求出网 · <code>web_search(\"信创 egress 数据主权\")</code> · keyless · 国产白名单 · tier B（有外呼能力，调用前确认）。","請求出網 · <code>web_search(\"信創 egress 數據主權\")</code> · keyless · 國產白名單 · tier B（有外呼能力，調用前確認）。","Egress request · <code>web_search(\"trusted-stack egress sovereignty\")</code> · keyless · domestic allowlist · tier B (egress-capable, confirm first)."],
+ "cw.scout.go":["已获批准，联网取证（经出网门审计）…","已獲批准，聯網取證（經出網門審計）…","Approved — fetching evidence online (audited at the egress gate)…"],
+ "cw.scout.denied":["你拒绝了出网 · 联网侦察回落本地资料（零外呼）","你拒絕了出網 · 聯網偵察回落本地資料（零外呼）","You denied egress · Web Scout falls back to local material (no egress)"],
+ "cw.uma.cross":["资料已够，想再用海外模型 Claude 交叉复核一次结论…","資料已夠，想再用海外模型 Claude 交叉複核一次結論…","Material looks sufficient; let me cross-check the conclusion once with the overseas model Claude…"],
+ "cw.uma.fallback":["非国产被出网门拒，已回落国产模型。{y} 直接综合。","非國產被出網門拒，已回落國產模型。{y} 直接綜合。","Non-domestic was denied by the gate; fell back to domestic models. {y} synthesize directly."],
+ "cw.uma.localok":["本地优先：资料充分，无需出网。{y} 直接综合归档。","本地優先：資料充分，無需出網。{y} 直接綜合歸檔。","Local-first: material is sufficient, no egress needed. {y} synthesize and archive directly."],
+ "cw.delivered":["综合员已交付产物 · 可信回执已封存","綜合員已交付產物 · 可信回執已封存","Synthesizer delivered the artifact · trust receipt sealed"],
+ "出网请求 · egress":["出网请求 · egress","出網請求 · egress","Egress request"],"待确认 HITL":["待确认 · HITL","待確認 · HITL","Pending · HITL"],
+ "批准出网":["批准出网","批准出網","Approve egress"],"拒绝":["拒绝","拒絕","Deny"],
+ "你已批准":["你已批准 · 出网门放行并写审计","你已批准 · 出網門放行並寫審計","Approved · gate allows & logs"],"你已拒绝":["你已拒绝 · 回落本地","你已拒絕 · 回落本地","Denied · fall back to local"],
+ "给团队布置任务,或用 / 命令、@ 指派智能体…":["给团队布置任务，或用 / 命令、@ 指派智能体…","給團隊佈置任務，或用 / 命令、@ 指派智能體…","Assign the team a task, or use / commands and @ to mention an agent…"],
+ "发送/运行":["发送/运行","發送/運行","Send / Run"],"换行":["换行","換行","New line"],"命令面板":["命令面板","命令面板","Palette"],
+ "slash 命令:/调研 /归档 /复核":["slash 命令: /调研 /归档 /复核","slash 命令: /調研 /歸檔 /複核","Slash: /research /archive /verify"],
+ "@ 指派:检索员/联网侦察/综合员":["@ 指派: 检索员 / 联网侦察 / 综合员","@ 指派: 檢索員 / 聯網偵察 / 綜合員","@ assign: Retriever / Web Scout / Synthesizer"],
+ "本地附件 · 信创沙箱(演示)":["本地附件 · 信创沙箱(演示)","本地附件 · 信創沙箱(示範)","Local attachment · trusted-stack sandbox (demo)"],
+ "新会话(演示)":["新会话(演示)","新會話(示範)","New channel (demo)"],
+ "均衡 balanced":["均衡 balanced","均衡 balanced","Balanced"],"本地优先 local-only":["本地优先 local-only","本地優先 local-only","Local-first · local-only"],"信创主权 sovereign":["信创主权 sovereign","信創主權 sovereign","Sovereign · domestic"],
+ /* ===== 库/图/码 打通 新增文案 ===== */
+ "关联":["关联","關聯","Linked"],"实体":["实体","實體","entities"],"关系":["关系","關係","edges"],
+ "cw.links.empty":["本会话触达的 库 / 图 / 码 将在此累积,可深链回溯。","本會話觸達的 庫 / 圖 / 碼 將在此累積,可深鏈回溯。","Vault / graph / code this session touches accrue here as deep links."],
+ "关联实体":["关联实体","關聯實體","Linked entities"],"点击预览/应用":["点击预览/应用","點擊預覽/套用","preview / apply"],
+ "产物 · 写回":["产物 · 写回","產物 · 寫回","Artifact · write-back"],"回填图谱":["回填图谱","回填圖譜","Backfill graph"],"应用补丁":["应用补丁","套用補丁","Apply patch"],
+ "在表面中打开 →":["在表面中打开 →","在表面中打開 →","Open in surface →"],
+ "展开为协同 →":["展开为协同 →","展開為協同 →","Open as Cowork →"],"围绕此实体发起协同 →":["围绕此实体发起协同 →","圍繞此實體發起協同 →","Start Cowork on this entity →"],"交协同验证":["交协同验证","交協同驗證","Verify via Cowork"],"升级为协同":["升级为协同","升級為協同","Escalate to Cowork"],
+ "cw.synth.tocoder":["已成稿并归档。{c} 把『每步过 egress 门』固化成一条回归测试。","已成稿並歸檔。{c} 把『每步過 egress 門』固化成一條回歸測試。","Drafted and archived. {c}, turn ‘every step passes the egress gate’ into a regression test."],
+ "cw.coder.done":["已生成补丁 · 一条回归测试,断言 agent_loop 每步都过 egress 门。","已生成補丁 · 一條回歸測試,斷言 agent_loop 每步都過 egress 門。","Patch ready · a regression test asserting agent_loop passes the egress gate each step."],
+ "cw.wb.vault.intro":["产物可归档为 Vault 文档(自动分块 / 向量化 / 抽三元组)——需你确认写回。","產物可歸檔為 Vault 文件(自動分塊 / 向量化 / 抽三元組)——需你確認寫回。","The artifact can be archived as a Vault doc (auto-chunk / embed / extract triples) — confirm the write-back."],
+ "cw.wb.vault.title":["写回 · 知识库","寫回 · 知識庫","Write-back · Vault"],
+ "cw.wb.vault.body":["将新建文档 <code>《出网审计机制 · 协同综合》</code> · 3 分块 · 本地存储 · 抽取 2 条三元组。","將新建文件 <code>《出網審計機制 · 協同綜合》</code> · 3 分塊 · 本地儲存 · 抽取 2 條三元組。","Creates doc <code>“Egress-audit · Cowork synthesis”</code> · 3 chunks · local · extracts 2 triples."],
+ "cw.wb.vault.done":["✓ 已归档为 Vault 新文档,并抽取三元组回填图谱队列。","✓ 已歸檔為 Vault 新文件,並抽取三元組回填圖譜佇列。","✓ Archived as a new Vault doc; triples queued for the graph."],
+ "cw.wb.graph.intro":["把综合结论里的实体关系回填 Mozi-KG——需你确认写回。","把綜合結論裡的實體關係回填 Mozi-KG——需你確認寫回。","Backfill the entities/relations from the conclusion into Mozi-KG — confirm the write-back."],
+ "cw.wb.graph.title":["写回 · 图谱","寫回 · 圖譜","Write-back · Graph"],
+ "cw.wb.graph.body":["将新增节点 <code>egress</code> 与两条边:<code>agent_loop —调用→ egress</code>、<code>egress —审计→ UMA网关</code>。","將新增節點 <code>egress</code> 與兩條邊:<code>agent_loop —調用→ egress</code>、<code>egress —審計→ UMA網關</code>。","Adds node <code>egress</code> and two edges: <code>agent_loop —calls→ egress</code>, <code>egress —audits→ UMA Gateway</code>."],
+ "cw.wb.graph.done":["✓ 已回填图谱 · 新增 egress 节点与 2 条关系,可在图谱表面查看。","✓ 已回填圖譜 · 新增 egress 節點與 2 條關係,可在圖譜表面查看。","✓ Backfilled the graph · added the egress node and 2 edges; view it in the Graph surface."],
+ "cw.wb.code.intro":["把编码员生成的回归测试应用到代码库——需你确认写回。","把編碼員生成的回歸測試套用到程式碼庫——需你確認寫回。","Apply the coder’s regression test to the codebase — confirm the write-back."],
+ "cw.wb.code.title":["写回 · 编码","寫回 · 編碼","Write-back · Code"],
+ "cw.wb.code.body":["将应用补丁 <code>tests/test_egress_gate.py</code> (+3 −0),并切到编码表面查看 diff。","將套用補丁 <code>tests/test_egress_gate.py</code> (+3 −0),並切到編碼表面查看 diff。","Applies patch <code>tests/test_egress_gate.py</code> (+3 −0) and opens the Code surface diff."],
+ "cw.wb.code.done":["✓ 补丁已应用 · 正切到编码表面展示行级 diff。","✓ 補丁已套用 · 正切到編碼表面展示行級 diff。","✓ Patch applied · opening the Code surface to show the line diff."],
+ "确认写回":["确认写回","確認寫回","Confirm write-back"],"取消":["取消","取消","Cancel"],"已写回":["已写回 · 落库","已寫回 · 落庫","Written back"],"已取消":["已取消","已取消","Cancelled"],
+ "已归档到知识库":["已归档到知识库","已歸檔到知識庫","Archived to Vault"],"已回填图谱":["已回填图谱","已回填圖譜","Backfilled the graph"],"补丁已应用(演示)":["补丁已应用(演示)","補丁已套用(示範)","Patch applied (demo)"],
+ "egress 唯一门审计每次外呼;主权模式非国产 provider 零字节出网。":["egress 唯一门审计每次外呼;主权模式非国产 provider 零字节出网。","egress 唯一門審計每次外呼;主權模式非國產 provider 零位元組出網。","The single egress gate audits every call; in sovereign mode non-domestic providers send zero bytes."],
+ "agent_loop 每步过 egress.classify 硬门并写 audit_log。":["agent_loop 每步过 egress.classify 硬门并写 audit_log。","agent_loop 每步過 egress.classify 硬門並寫 audit_log。","agent_loop passes egress.classify before each step and writes audit_log."],
+ "多智能体协同综合 · 已注入 2 处本地来源。":["多智能体协同综合 · 已注入 2 处本地来源。","多智能體協同綜合 · 已注入 2 處本地來源。","Multi-agent synthesis · 2 local sources injected."],
+ "cw.from":["由 {s} 发起的协同会话 · 已带入上下文","由 {s} 發起的協同會話 · 已帶入上下文","Cowork channel started from {s} · context carried in"],
+ "cw.from.note":["已接手{s}带来的上下文并注入。给我目标,我来拆解分派给团队。","已接手{s}帶來的上下文並注入。給我目標,我來拆解分派給團隊。","Picked up and injected the context from {s}. Give me a goal and I’ll break it down for the team."],
+ "已注入来源 · 来自":["已注入来源 · 来自","已注入來源 · 來自","Source injected · from "],"已发起协同 · 点运行":["已发起协同 · 点「运行」","已發起協同 · 點「運行」","Cowork started · hit Run"],
+ "升级为协同任务":["升级为协同任务","升級為協同任務","Escalate to a Cowork task"],"交协同验证补丁":["交协同验证补丁","交協同驗證補丁","Verify patch via Cowork"],
+ /* ===== 演示导览 ===== */
+ "演示导览":["演示导览","演示導覽","Guided tour"],"下一步":["下一步","下一步","Next"],"上一步":["上一步","上一步","Back"],"完成":["完成","完成","Done"],
+ "tck.0":["溯源·peek","溯源·peek","Trace·peek"],"tck.1":["写回·HITL","寫回·HITL","Write·HITL"],"tck.2":["编码员","編碼員","Coder"],"tck.3":["关联·入口","關聯·入口","Linked·entry"],
+ "tour.t0":["协同 · 编排中枢","協同 · 編排中樞","Cowork · the hub"],
+ "tour.t1":["交给助手 · 幕后协同","交給助手 · 幕後協同","Ask assistant · backstage"],
+ "tour.t2":["① 溯源 · peek 抽屉","① 溯源 · peek 抽屉","① Trace · peek drawer"],
+ "tour.t3":["② 写回 · HITL","② 寫回 · HITL","② Write-back · HITL"],
+ "tour.t4":["④ 关联账本","④ 關聯帳本","④ Linked ledger"],
+ "tour.t5":["④ 反向入口","④ 反向入口","④ Reverse entry"],
+ "tour.t6":["演示完成","演示完成","Tour complete"],
+ "tour.b0":["协同前台是你与同事的协作;库 / 图 / 码 的打通就发生在这里。下面约 30 秒走完四项。","協同前台是你與同事的協作;庫 / 圖 / 碼 的打通就發生在這裡。下面約 30 秒走完四項。","The Cowork foreground is you collaborating with colleagues; the Vault/Graph/Code integrations happen here. ~30s for all four."],
+ "tour.b1":["你把任务交给墨子助手:幕后多智能体在『智能体工作台』里 observe→act,HITL 自动批准;前台只看到助手的结果。","你把任務交給墨子助手:幕後多智能體在『智能體工作台』裡 observe→act,HITL 自動批准;前台只看到助手的結果。","You delegate to the Mozi Assistant: backstage multi-agents observe→act in the Agent activity panel, HITL auto-approved; the foreground only shows the assistant's result."],
+ "tour.b2":["命中块=Vault 卡、实体=图谱 chip、补丁=diff 卡 —— 点开都从右侧抽屉就地预览,再跳对应表面。","命中塊=Vault 卡、實體=圖譜 chip、補丁=diff 卡 —— 點開都從右側抽屜就地預覽,再跳對應表面。","Hits = Vault cards, entities = graph chips, patches = diff cards — each opens a side peek drawer, then jumps to its surface."],
+ "tour.b3":["产物三键写回都先弹确认卡:这里归档为 Vault 新文档(已自动确认)。回填图谱 / 应用补丁同理。","產物三鍵寫回都先彈確認卡:這裡歸檔為 Vault 新文件(已自動確認)。回填圖譜 / 套用補丁同理。","All three write-backs prompt a confirm card first: here it archives a new Vault doc (auto-confirmed). Backfill graph / apply patch work the same."],
+ "tour.b4":["右栏「关联」累积了本会话触达的 库 / 图 / 码,每条可深链回跳。","右欄「關聯」累積了本會話觸達的 庫 / 圖 / 碼,每條可深鏈回跳。","The Linked ledger has accrued every Vault / Graph / Code item this session touched — each deep-links back."],
+ "tour.b5":["反向也通:知识库文档可『展开为协同』;图谱实体、编码、对答 各有入口。","反向也通:知識庫文件可『展開為協同』;圖譜實體、編碼、對答 各有入口。","It works in reverse too: a Vault doc can ‘Open as Cowork’; Graph entities, Code, and Chat each have an entry point."],
+ "tour.b6":["四项打通全部演示完成 ✓ —— 点『完成』退出,或顶栏「演示导览」再走一遍。","四項打通全部演示完成 ✓ —— 點『完成』退出,或頂欄「演示導覽」再走一遍。","All four integrations demonstrated ✓ — hit ‘Done’, or replay via ‘Guided tour’ in the top bar."],
+ /* ===== 知识闭环导览 (协同×库×图) ===== */
+ "全链路打通":["全链路打通","全鏈路打通","Full integration"],"知识闭环 · 库×图":["知识闭环 · 库×图","知識閉環 · 庫×圖","Knowledge loop · Vault×Graph"],"4 项":["4 项","4 項","4 items"],
+ "kck.0":["检索·库","檢索·庫","Search·Vault"],"kck.1":["实体·图","實體·圖","Entity·Graph"],"kck.2":["归档·库","歸檔·庫","Archive·Vault"],"kck.3":["回填·图","回填·圖","Backfill·Graph"],
+ "kb.t0":["库 × 图 · 同一份知识","庫 × 圖 · 同一份知識","Vault × Graph · one knowledge"],
+ "kb.t1":["读 · 检索 + 注入门","讀 · 檢索 + 注入門","Read · search + inject gate"],
+ "kb.t2":["文档视图 · peek 知识库","文檔視圖 · peek 知識庫","Doc view · peek Vault"],
+ "kb.t3":["网络视图 · peek 图谱","網絡視圖 · peek 圖譜","Network view · peek Graph"],
+ "kb.t4":["写 · 归档回知识库","寫 · 歸檔回知識庫","Write · archive to Vault"],
+ "kb.t5":["写 · 回填图谱","寫 · 回填圖譜","Write · backfill Graph"],
+ "kb.t6":["闭环达成","閉環達成","Loop closed"],
+ "kb.b0":["知识库是『文档视图』,图谱是『网络视图』——同一份知识的两面。协同(agent_loop)是读写两者、让它们同步的引擎。下面演示这条闭环。","知識庫是『文檔視圖』,圖譜是『網絡視圖』——同一份知識的兩面。協同(agent_loop)是讀寫兩者、讓它們同步的引擎。下面演示這條閉環。","Vault is the ‘document view’, Graph the ‘network view’ — two faces of one knowledge base. Cowork (agent_loop) reads and writes both, keeping them in sync. Here’s the loop."],
+ "kb.b1":["协同检索 Vault 多路命中,并把命中分块 + 相关图谱实体一起经『注入门』注入上下文(带 provenance,低于阈值不注入)。","協同檢索 Vault 多路命中,並把命中分塊 + 相關圖譜實體一起經『注入門』注入上下文(帶 provenance,低於閾值不注入)。","Cowork runs a multi-route Vault search and injects the hit chunks + related graph entities through the inject gate (with provenance; skipped below threshold)."],
+ "kb.b2":["点命中卡 → 抽屉看分块与三元组:这是知识的『文档视图』。","點命中卡 → 抽屜看分塊與三元組:這是知識的『文檔視圖』。","Click a hit → the drawer shows chunks and triples: the ‘document view’ of the knowledge."],
+ "kb.b3":["点实体 chip → 同一条知识的『网络视图』:邻域与关系。库与图,一键互切。","點實體 chip → 同一條知識的『網絡視圖』:鄰域與關係。庫與圖,一鍵互切。","Click an entity chip → the same knowledge as a ‘network view’: neighborhood and relations. Vault and Graph, one click apart."],
+ "kb.b4":["综合产物归档回 Vault:新建文档,自动分块 + 向量化——知识库被更新。","綜合產物歸檔回 Vault:新建文件,自動分塊 + 向量化——知識庫被更新。","The synthesis is archived back to Vault: a new doc, auto-chunked and embedded — the Vault is updated."],
+ "kb.b5":["同一份结论抽取三元组、回填图谱:新增 egress 节点与关系——图谱同步更新。","同一份結論抽取三元組、回填圖譜:新增 egress 節點與關係——圖譜同步更新。","The same conclusion’s triples are extracted and backfilled into the graph: a new egress node and edges — the graph updates in sync."],
+ "kb.b6":["知识库多了这篇协同综合、图谱多了 egress 实体——一次协同同步更新两个视图,且可被下一轮检索 / 发起协同复用。闭环达成 ✓。","知識庫多了這篇協同綜合、圖譜多了 egress 實體——一次協同同步更新兩個視圖,且可被下一輪檢索 / 發起協同複用。閉環達成 ✓。","Vault gained this synthesis doc and Graph gained the egress entity — one Cowork run updated both views, ready to be searched or re-opened as Cowork next round. Loop closed ✓."],
+ /* ===== 协同重构:前台人类协同 + 后台智能体工作台 ===== */
+ "协作同事":["协作同事","協作同事","Colleagues"],"频道":["频道","頻道","Channels"],
+ "智能体工作台":["智能体工作台","智能體工作台","Agent activity"],"智能体工作台 · observe→act":["智能体工作台 · observe→act","智能體工作台 · observe→act","Agent activity · observe→act"],
+ "ins.note":["这是协同背后的多智能体后台:agent_loop 的 observe→act 步骤、可信回执与出网审计。前台只呈现你与同事的协同结果。","這是協同背後的多智能體後台:agent_loop 的 observe→act 步驟、可信回執與出網審計。前台只呈現你與同事的協同結果。","Backstage: the multi-agent agent_loop (observe→act), the trust receipt, and the egress audit. The foreground only shows your collaboration with colleagues."],
+ "在线":["在线","在線","online"],"离开":["离开","離開","away"],"已完成":["已完成","已完成","done"],
+ "处理中…":["处理中…","處理中…","Working…"],"交给助手":["交给助手","交給助手","Ask assistant"],"发送":["发送","發送","Send"],"@墨子助手 交办":["@墨子助手 交办","@墨子助手 交辦","@assistant to delegate"],
+ "新频道(演示)":["新频道(演示)","新頻道(示範)","New channel (demo)"],"演示频道 · 切回 #出网审计合规说明 可运行":["演示频道 · 切回 #出网审计合规说明 可运行","示範頻道 · 切回 #出網審計合規說明 可執行","Demo channel · switch back to #egress-audit to run"],
+ "查看智能体协同过程 ▸":["查看智能体协同过程 ▸","查看智能體協同過程 ▸","See agent activity ▸"],"查看智能体协同过程":["查看智能体协同过程","查看智能體協同過程","See agent activity"],"步":["步","步","steps"],
+ "模型":["模型","模型","Model"],"隐私":["隐私","隱私","Privacy"],
+ "产品":["产品","產品","Product"],"工程":["工程","工程","Eng"],"设计":["设计","設計","Design"],"AI 助手":["AI 助手","AI 助手","AI assistant"],
+ "林青":["林青","林青","Lin Qing"],"沈舟":["沈舟","沈舟","Shen Zhou"],"周遥":["周遥","周遙","Zhou Yao"],"墨子助手":["墨子助手","墨子助手","Mozi Assistant"],
+ "出网审计合规说明":["出网审计合规说明","出網審計合規說明","Egress-audit compliance note"],"豆包接入 · 上线排期":["豆包接入 · 上线排期","豆包接入 · 上線排期","Doubao integration · launch schedule"],"设计系统 v2.1 走查":["设计系统 v2.1 走查","設計系統 v2.1 走查","Design system v2.1 review"],
+ "给同事留言,或 @墨子助手 交办任务…":["给同事留言,或 @墨子助手 交办任务…","給同事留言,或 @墨子助手 交辦任務…","Message colleagues, or @assistant to delegate a task…"],
+ "cw.h.lin1":["出网审计这块要给客户写一份合规说明,谁能整理一下机制?","出網審計這塊要給客戶寫一份合規說明,誰能整理一下機制?","We need a compliance note on the egress-audit mechanism for the client — who can write it up?"],
+ "cw.h.shen1":["机制我清楚,但落成文档要花点时间。","機制我清楚,但落成文檔要花點時間。","I know the mechanism, but turning it into a doc takes time."],
+ "cw.h.you1":["我让墨子助手先整理一份《出网审计机制》合规说明。","我讓墨子助手先整理一份《出網審計機制》合規說明。","I'll have the Mozi Assistant draft an egress-audit compliance note first."],
+ "cw.h.lin2":["太好了,我直接加到合规附录,@沈舟 你过一下技术细节。","太好了,我直接加到合規附錄,@沈舟 你過一下技術細節。","Great — I'll drop it into the compliance appendix. @Shen Zhou, please check the technical details."],
+ "cw.h.ack":["收到 👌","收到 👌","Got it 👌"],
+ "cw.asst.take":["收到。我来协同处理:检索本地资料、必要时联网佐证,再综合成稿。","收到。我來協同處理:檢索本地資料、必要時聯網佐證,再綜合成稿。","On it. I'll handle this: search local material, fetch a citation if needed, then synthesize a draft."],
+ "cw.asst.hitl":["这一步需要出网取一条外部佐证——按人在回路,请你批准。","這一步需要出網取一條外部佐證——按人在回路,請你批准。","This step needs to fetch one external citation — per human-in-the-loop, please approve."],
+ "cw.synth.done":["已综合成稿:出网审计机制合规说明(本地资料 + 已审计外部佐证)。","已綜合成稿:出網審計機制合規說明(本地資料 + 已審計外部佐證)。","Draft synthesized: egress-audit compliance note (local material + audited external citation)."],
+ "问点什么…":["问点什么…","問點什麼…","Ask anything…"],"chat.echo":["(演示) 已收到。墨子会多路检索本地资料并作答。","(示範) 已收到。墨子會多路檢索本地資料並作答。","(demo) Got it. Mozi will answer with multi-route local retrieval."],
+ /* ===== 图谱节点=知识库文档映射 ===== */
+ "检索架构":["检索架构","檢索架構","Retrieval arch"],"出网审计":["出网审计","出網審計","Egress audit"],"豆包接入":["豆包接入","豆包接入","Doubao integ"],"前端蓝图":["前端蓝图","前端藍圖","Frontend bp"],"图谱设计":["图谱设计","圖譜設計","Graph design"],"SSE 桥契约":["SSE 桥契约","SSE 橋契約","SSE bridge"],"设计系统":["设计系统","設計系統","Design system"],"缺陷清单":["缺陷清单","缺陷清單","Defect list"],"有界循环":["有界循环","有界循環","Bounded loop"],"v3 交付":["v3 交付","v3 交付","v3 delivery"],
+ "检索引擎":["检索引擎","檢索引擎","Retrieval"],"egress 出网门":["egress 出网门","egress 出網門","egress gate"],"墨韵设计系统":["墨韵设计系统","墨韻設計系統","Mo-Yun design"],"统一外壳":["统一外壳","統一外殼","App shell"],"交付与评审":["交付与评审","交付與評審","Delivery & review"],
+ "文档":["文档","文件","Document"],"事件":["事件","事件","Event"],
+ "涉及":["涉及","涉及","covers"],"门控":["门控","門控","gates"],"写入":["写入","寫入","writes"],
+ "在知识库打开此文档":["在知识库打开此文档","在知識庫打開此文件","Open this doc in Vault"],"相关文档":["相关文档","相關文件","Related docs"]
+};
+function T(k){const e=MAP[k];return e?e[LIDX()]:k;}
+const ICON={
+  chat:'<path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.7-.9L3 21l1.9-5.8A8.5 8.5 0 1 1 21 11.5z"/>',
+  vault:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 9h6M9 13h6M9 17h3"/>',
+  graph:'<circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="8" r="2.4"/><circle cx="12" cy="17" r="2.4"/><path d="M8 7l8 1M7.5 8l4 7M16 10l-3 6"/>',
+  cowork:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="18" cy="9" r="2"/><path d="M14.5 20a4 4 0 0 1 6.5-3"/>',
+  code:'<path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13 7l-2 10"/>'
+};
+const SURFACES=[['chat','对答'],['vault','知识库'],['graph','图谱'],['cowork','协同'],['code','编码']];
+let curSurface='chat';
+function buildRail(){
+  $('#rail').innerHTML=SURFACES.map(([k,l])=>`<button class="railitem${k===curSurface?' active':''}" data-go="${k}" title="${T(l)}">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg>
+  <span class="lbl">${T(l)}</span>${k==='cowork'?'<span class="reddot"></span>':''}</button>`).join('')
+  +`<button class="railitem railfoot" title="${T('设置')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5a7 7 0 0 0 .1-1z"/></svg></button>`;
+}
+$('#rail').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+function go(s){
+  curSurface=s;
+  $$('.surface').forEach(x=>x.classList.toggle('active',x.dataset.surface===s));
+  $$('.railitem').forEach(x=>x.classList.toggle('active',x.dataset.go===s));
+  if(s==='graph')requestAnimationFrame(resizeGraph);
+}
+// theme
+$('#themeBtn').onclick=()=>{
+  const d=document.documentElement;const dark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',dark?'light':'dark');
+  $('#thIcon').innerHTML=dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>':'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+  readGraphColors();
+};
+
+/* ============ MODEL SWITCHER + PRIVACY GATE (egress) ============ */
+const MODELS=[
+  {id:'auto',name:'自动 (UMA)',domestic:true},
+  {id:'deepseek-v4-pro',name:'DeepSeek-V4-Pro',domestic:true},
+  {id:'doubao-seed-evolving',name:'doubao-seed-evolving',domestic:true}
+];
+let currentModel='auto', privacy='local_first';
+const SHIELD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/></svg>';
+const LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const resolveModel=()=>currentModel==='auto'?'deepseek-v4-pro':currentModel;
+function toast(msg,kind){const t=$('#toast');t.textContent=msg;t.className='show'+(kind==='deny'?' deny':'');clearTimeout(t._h);t._h=setTimeout(()=>t.className='',2600);}
+function syncRoute(){const rm=resolveModel();$('#stModel').textContent=currentModel==='auto'?(T('自动 (UMA)')+' → '+rm):rm;}
+function updatePrivacyUI(){const sov=privacy==='sovereign';
+  const pb=$('#privacyBtn');if(pb){pb.classList.toggle('sov',sov);$('#privacyIc').innerHTML=sov?LOCK:SHIELD;$('#privacyLbl').textContent=T(sov?'主权模式 · 仅国产出网':'本地优先 · 零外呼');}
+  const cw=$('#cwPrivacy');if(cw){cw.textContent=(sov?'sovereign':'local_first');cw.style.color=sov?'var(--cinnabar)':'var(--celadon-ink)';}
+  const sp=$('#cwSovPill');if(sp){sp.textContent=T(sov?'信创主权 sovereign':'本地优先 local-only');sp.className='chip'+(sov?' cinnabar':' celadon');}}
+function updateModelUI(){$('#modelLbl').textContent=T(MODELS.find(m=>m.id===currentModel).name);renderModelMenu();syncRoute();}
+function renderModelMenu(){
+  $('#modelMenu').innerHTML=MODELS.map(m=>`<div class="mm-item${m.id===currentModel?' cur':''}" onclick="selectModel('${m.id}')">
+    <span class="ck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
+    <span class="nm">${T(m.name)}</span></div>`).join('');}
+function toggleModelMenu(e){e.stopPropagation();$('#modelMenu').classList.toggle('open');renderModelMenu();}
+function closeModelMenu(){$('#modelMenu').classList.remove('open');}
+function selectModel(id){const m=MODELS.find(x=>x.id===id);
+  currentModel=id;toast(T('已切模型')+' · '+T(m.name));
+  updateModelUI();closeModelMenu();}
+function togglePrivacy(){privacy=privacy==='local_first'?'sovereign':'local_first';updatePrivacyUI();updateModelUI();
+  toast(T(privacy==='sovereign'?'已切主权模式 · 非国产 provider 禁止出网':'已切本地优先 · 零外呼默认'));}
+addEventListener('click',e=>{if(!e.target.closest('.modelwrap'))closeModelMenu();});
+
+/* ============ KNOWLEDGE GRAPH (self-built force layout) ============ */
+const TYPES={平台:1,网关:7,模块:3,存储:8,模型:2,概念:5,技术:3,引擎:6,文档:4,事件:6};
+/* 图谱节点 = 知识库文档的映射(doc) + 连接它们的概念枢纽;点文档节点跳转知识库 */
+const RAW_NODES=[
+  {id:'检索架构',type:'文档',doc:1},{id:'出网审计',type:'文档',doc:2},{id:'豆包接入',type:'文档',doc:3},
+  {id:'前端蓝图',type:'文档',doc:4},{id:'图谱设计',type:'文档',doc:5},{id:'SSE 桥契约',type:'文档',doc:6},
+  {id:'设计系统',type:'文档',doc:7},{id:'缺陷清单',type:'文档',doc:8},{id:'有界循环',type:'文档',doc:9},
+  {id:'v3 交付',type:'文档',doc:10},
+  {id:'检索引擎',type:'概念'},{id:'egress 出网门',type:'概念'},{id:'agent_loop',type:'引擎'},{id:'Mozi-KG',type:'模块'},
+  {id:'UMA网关',type:'网关'},{id:'墨韵设计系统',type:'概念'},{id:'统一外壳',type:'模块'},{id:'交付与评审',type:'事件'}
+];
+const RAW_EDGES=[
+  ['检索架构','涉及','检索引擎'],['检索架构','抽取','Mozi-KG'],['出网审计','涉及','egress 出网门'],
+  ['豆包接入','涉及','UMA网关'],['前端蓝图','涉及','统一外壳'],['图谱设计','涉及','Mozi-KG'],['图谱设计','涉及','统一外壳'],
+  ['SSE 桥契约','涉及','agent_loop'],['SSE 桥契约','涉及','统一外壳'],['设计系统','涉及','墨韵设计系统'],
+  ['缺陷清单','涉及','交付与评审'],['有界循环','涉及','agent_loop'],['有界循环','调用','检索引擎'],
+  ['v3 交付','涉及','交付与评审'],['v3 交付','涉及','统一外壳'],
+  ['egress 出网门','门控','agent_loop'],['UMA网关','驱动','agent_loop'],['检索引擎','写入','Mozi-KG']
+];
+let GC={};
+function readGraphColors(){GC={};const cs=getComputedStyle(document.documentElement);
+  /* §C.6.1 Canvas 禁硬编码 hex, 一律读 --graph-* 令牌(保 light/dark 自动切换) */
+  for(let i=1;i<=8;i++)GC[i]=cs.getPropertyValue('--graph-node-'+i).trim();
+  GC.edge=cs.getPropertyValue('--graph-edge').trim();GC.dim=cs.getPropertyValue('--ink-3').trim();
+  GC.focus=cs.getPropertyValue('--celadon').trim();GC.hi=cs.getPropertyValue('--graph-edge-active').trim();
+  GC.paper=cs.getPropertyValue('--paper-sink').trim();GC.label=cs.getPropertyValue('--ink-2').trim();GC.cinnabar=cs.getPropertyValue('--cinnabar').trim();}
+const cv=$('#graphCanvas');const ctx=cv.getContext('2d');
+let nodes=[],edges=[],adj={},focusId=null,hoverId=null,drag=null;
+function initGraph(){
+  nodes=RAW_NODES.map((n,i)=>({...n,x:300+Math.cos(i)*120,y:240+Math.sin(i*1.7)*110,vx:0,vy:0,deg:0}));
+  const idx=Object.fromEntries(nodes.map(n=>[n.id,n]));
+  edges=RAW_EDGES.map(([s,p,t])=>({s:idx[s],t:idx[t],pred:p}));
+  adj={};nodes.forEach(n=>adj[n.id]=[]);
+  edges.forEach(e=>{e.s.deg++;e.t.deg++;adj[e.s.id].push({n:e.t,p:e.pred,dir:'→'});adj[e.t.id].push({n:e.s,p:e.pred,dir:'←'})});
+  renderLegend();
+}
+function renderLegend(){const used=new Set((nodes||[]).map(n=>n.type));
+  $('#legend').innerHTML=Object.entries(TYPES).filter(([k])=>!used.size||used.has(k)).map(([k,v])=>`<span><i style="background:var(--gn${v})"></i>${T(k)}</span>`).join('');
+  const gc=$('#graphCount');if(gc&&nodes&&nodes.length)gc.textContent=nodes.length+' '+T('实体')+' / '+edges.length+' '+T('关系');}
+let spreaded=false;
+function spread(w,h){const N=nodes.length;nodes.forEach((n,i)=>{const a=i*2.399963;const R=Math.min(w,h)*0.36*Math.sqrt((i+1)/N);
+  n.x=w/2+Math.cos(a)*R*1.55;n.y=h/2+Math.sin(a)*R;n.vx=n.vy=0;});}
+function resizeGraph(){const w=cv.parentElement.clientWidth,h=cv.parentElement.clientHeight;const dpr=devicePixelRatio||1;
+  cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);cv.style.width=w+'px';cv.style.height=h+'px';
+  if(!spreaded&&w>20){spread(w,h);spreaded=true;}}
+function tick(){
+  const w=cv.clientWidth,h=cv.clientHeight,cx=w/2,cy=h/2;
+  for(let i=0;i<nodes.length;i++){const a=nodes[i];
+    for(let j=i+1;j<nodes.length;j++){const b=nodes[j];let dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy||1,d=Math.sqrt(d2);
+      const f=Math.min(22000/d2,9);const ux=dx/d,uy=dy/d;a.vx+=ux*f;a.vy+=uy*f;b.vx-=ux*f;b.vy-=uy*f;}
+    a.vx+=(cx-a.x)*0.0006;a.vy+=(cy-a.y)*0.0006;}
+  edges.forEach(e=>{let dx=e.t.x-e.s.x,dy=e.t.y-e.s.y,d=Math.sqrt(dx*dx+dy*dy)||1;const f=(d-120)*0.008;const ux=dx/d,uy=dy/d;
+    e.s.vx+=ux*f;e.s.vy+=uy*f;e.t.vx-=ux*f;e.t.vy-=uy*f;});
+  nodes.forEach(n=>{if(n===drag)return;n.vx*=.86;n.vy*=.86;n.x+=n.vx;n.y+=n.vy;
+    n.x=Math.max(28,Math.min(w-28,n.x));n.y=Math.max(24,Math.min(h-24,n.y));});
+}
+function neighborsOf(id){return new Set(adj[id]?adj[id].map(a=>a.n.id).concat(id):[])}
+function draw(){
+  const w=cv.clientWidth,h=cv.clientHeight;ctx.clearRect(0,0,w,h);
+  const spot=hoverId||focusId;const near=spot?neighborsOf(spot):null;
+  edges.forEach(e=>{const on=!spot||(near.has(e.s.id)&&near.has(e.t.id));
+    ctx.strokeStyle=on?(spot?GC.hi:GC.edge):GC.edge;ctx.globalAlpha=on?(spot?.9:.55):.12;ctx.lineWidth=on&&spot?1.6:1;
+    ctx.beginPath();ctx.moveTo(e.s.x,e.s.y);ctx.lineTo(e.t.x,e.t.y);ctx.stroke();
+    if(on&&spot){ctx.globalAlpha=.9;ctx.fillStyle=GC.label;ctx.font='10px var(--font-mono),monospace';ctx.textAlign='center';
+      ctx.fillText(T(e.pred),(e.s.x+e.t.x)/2,(e.s.y+e.t.y)/2-3);}});
+  ctx.globalAlpha=1;
+  nodes.forEach(n=>{const on=!spot||near.has(n.id);const r=7+Math.min(n.deg,7)*1.6;
+    ctx.globalAlpha=on?1:.2;ctx.beginPath();ctx.arc(n.x,n.y,r,0,7);ctx.fillStyle=GC[TYPES[n.type]];ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle=GC.paper;ctx.stroke();
+    if(n.id===focusId){ctx.lineWidth=2.5;ctx.strokeStyle=GC.cinnabar;ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,7);ctx.stroke();}
+    ctx.globalAlpha=on?1:.3;ctx.fillStyle=GC.label;ctx.font=(n.id===spot?'600 ':'')+'12px var(--font-sans),sans-serif';ctx.textAlign='center';
+    ctx.fillText(T(n.id),n.x,n.y+r+13);});
+  ctx.globalAlpha=1;
+}
+let raf;function loop(){tick();draw();raf=requestAnimationFrame(loop)}
+function nodeAt(x,y){return nodes.find(n=>{const r=9+Math.min(n.deg,7)*1.6;return (n.x-x)**2+(n.y-y)**2<(r+4)**2})}
+function openDocFromGraph(id){go('vault');vaultView('list');openDoc(id);}
+function selectNode(n){focusId=n.id;const d=n.doc?DOCS.find(x=>x.id===n.doc):null;
+  $('#nodeTitle').textContent=d?T(d.t):T(n.id);
+  $('#nodeMeta').innerHTML=`<span class="chip" style="border-color:var(--gn${TYPES[n.type]})">${T(n.type)}</span> degree ${n.deg}`;
+  let html='';
+  if(d){html+=`<div class="hitcard" style="border-color:var(--celadon);background:var(--celadon-soft);margin:2px 0 12px" onclick="openDocFromGraph(${d.id})"><div class="t">→ ${T('在知识库打开此文档')}</div><div class="src">${T(d.t)} · ${d.chunks} ${T('分块')} · ${d.store}</div></div>`;}
+  const docNbrs=adj[n.id].filter(a=>a.n.doc);
+  if(!d&&docNbrs.length){html+=`<h3 style="font-size:12px;margin:2px 0 6px">${T('相关文档')}</h3>`+docNbrs.map(a=>{const dd=DOCS.find(x=>x.id===a.n.doc);return `<div class="hitcard" style="margin-bottom:6px" onclick="openDocFromGraph(${a.n.doc})"><div class="t">${T(dd.t)}</div><div class="src">${T(a.p)} · ${dd.store}</div></div>`;}).join('');}
+  html+=`<h3 style="font-size:12px;margin:10px 0 6px">${T('邻接关系')}</h3>`+adj[n.id].map(a=>{const tgt=a.dir==='→'?a.n:n;const click=tgt.doc?` style="cursor:pointer" onclick="openDocFromGraph(${tgt.doc})"`:'';
+    return `<div class="edge"${click}>${a.dir==='→'?'<b>'+T(n.id)+'</b>':'<b>'+T(a.n.id)+'</b>'}<span class="pred">${T(a.p)}</span>${a.dir==='→'?'<b>'+T(a.n.id)+'</b>':'<b>'+T(n.id)+'</b>'}</div>`;}).join('');
+  html+=`<button class="cw-entry" style="margin-top:12px" onclick="cwFrom('graph','${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="18" cy="9" r="2"/><path d="M14.5 20a4 4 0 0 1 6.5-3"/></svg>${T('围绕此实体发起协同 →')}</button>`;
+  $('#adjList').innerHTML=html;}
+cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+  if(drag){drag.x=x;drag.y=y;drag.vx=drag.vy=0;return}hoverId=(nodeAt(x,y)||{}).id||null;cv.style.cursor=hoverId?'pointer':'grab';});
+cv.addEventListener('mousedown',e=>{const r=cv.getBoundingClientRect();const n=nodeAt(e.clientX-r.left,e.clientY-r.top);if(n){drag=n;selectNode(n)}});
+cv.addEventListener('dblclick',e=>{const r=cv.getBoundingClientRect();const n=nodeAt(e.clientX-r.left,e.clientY-r.top);if(n&&n.doc)openDocFromGraph(n.doc);});
+addEventListener('mouseup',()=>drag=null);
+$('#graphSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.target.value.trim().toLowerCase();const n=nodes.find(x=>x.id.toLowerCase().includes(q)||T(x.id).toLowerCase().includes(q));if(n)selectNode(n)}});
+function graphView(v){$('#segGlobal').classList.toggle('on',v==='global');$('#segLocal').classList.toggle('on',v==='local');}
+
+/* ============ VAULT ============ */
+const DOCS=[
+  {id:1,t:'墨子检索架构',type:'笔记',chunks:4,store:'local',date:'2026-06-25',tag:'研究',icon:'research',
+   body:['墨子的检索是多路融合：稠密向量、BM25、FTS5 三路命中后按 score 加权。','归档时文本自动分块 (chunking)，每块向量化 (BGE-M3)，并经 LLM+正则抽取 KG 三元组。','检索注入受 inject_gate 门控：低于阈值不自动注入对话上下文。','出处随每条 hit 返回 provenance，可深链回原文 chunk。'],
+   triples:[['墨子','使用','BM25'],['墨子','使用','向量索引'],['Vault','抽取','Mozi-KG']]},
+  {id:2,t:'出网审计机制',type:'笔记',chunks:3,store:'sovereign',date:'2026-06-24',tag:'审查报告',icon:'audit',
+   body:['egress 是唯一出网判定门：sovereign 隐私级下非国产模型直接拒绝，零字节出网。','每次模型推理与 web_search 工具调用都写 egress 审计行。','agent_loop 每步调模型前先过 egress.classify 硬门。'],
+   triples:[['egress','审计','model.infer'],['sovereign','拒绝','非国产模型']]},
+  {id:3,t:'豆包推理模型接入',type:'对话',chunks:2,store:'local',date:'2026-06-23',tag:'交付报告',icon:'ship',
+   body:['火山方舟豆包 doubao-seed-evolving，OpenAI 兼容 /chat/completions。','reasoning_content 经 ReasoningDelta 事件与正文分流。'],
+   triples:[['UMA网关','路由','豆包推理']]},
+  {id:4,t:'前端蓝图 · 四表面与统一外壳',type:'交付',chunks:6,store:'local',date:'2026-06-27',tag:'交付报告',icon:'ship',
+   body:['统一外壳 Mode Rail + Cmd/K + 状态条；四表面挂载契约。','蜂群 8 agent 设计 → 对抗评审 → 路线图。'],triples:[['外壳','挂载','四表面']]},
+  {id:5,t:'知识图谱表面设计 (类 Obsidian)',type:'计划',chunks:5,store:'local',date:'2026-06-26',tag:'计划',icon:'plan',
+   body:['自研 Verlet 力导向画布；≤100 SVG / 101-500 Canvas / >500 聚类 LOD。','a11y 等级 D：三元组邻接表必并存。'],triples:[['图谱','复用','KGPane']]},
+  {id:6,t:'Cowork SSE 桥契约',type:'计划',chunks:3,store:'local',date:'2026-06-24',tag:'计划',icon:'plan',
+   body:['新增 POST /v1/cowork/run (SSE) 透传 agent_loop 逐步事件。','复用 chat SSE 框架 + Last-Event-ID 尾态回放。'],triples:[['agent_loop','透传','SSE 桥']]},
+  {id:7,t:'设计系统扩展 + 依赖裁决',type:'计划',chunks:4,store:'local',date:'2026-06-23',tag:'计划',icon:'plan',
+   body:['新增图谱/语法/步骤/diff/密度 token；六项能力全自研零依赖。','逃生口 CM6/Prism/Cytoscape 仅复杂度爆发懒加载。'],triples:[['墨韵','扩展','token']]},
+  {id:8,t:'12 Epic 缺陷清单 (8B/17M/24m)',type:'评审',chunks:2,store:'local',date:'2026-06-22',tag:'评审',icon:'audit',
+   body:['对抗评审 BLOCKER/MAJOR/MINOR 分级。','悬挂边 bug + agent_loop SSE 缺口 = P0。'],triples:[['评审','发现','BLOCKER']]},
+  {id:9,t:'agent_loop 有界工具循环',type:'研究',chunks:3,store:'local',date:'2026-06-21',tag:'研究',icon:'research',
+   body:['observe→act 迭代调工具，穿 sovereign 门 / 沙箱 / 配额硬上限。','逐步 yield tool_call/tool_result/egress_denied 子事件。'],triples:[['agent_loop','调用','Skills']]},
+  {id:10,t:'墨子 v3 全量执行交付报告 (12 Epic)',type:'交付',chunks:8,store:'local',date:'2026-07-02',tag:'交付报告',icon:'ship',
+   body:['12 epic 串行落地；基准、进度、验收。'],triples:[['v3','落地','12 Epic']]}
+];
+const TLICON={
+  report:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 9h6M9 13h6M9 17h3"/>',
+  plan:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  audit:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/>',
+  research:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>',
+  ship:'<path d="M5 16l2-9h10l2 9M3 16h18l-2 4H5z"/>'
+};
+const TAGCLS={'交付报告':'cinnabar','计划':'celadon','审查报告':'green','研究':'gold','评审':'gold'};
+function renderDocs(filter=''){const q=filter.toLowerCase();
+  $('#docList').innerHTML=DOCS.filter(d=>!q||d.t.toLowerCase().includes(q)||T(d.t).toLowerCase().includes(q)).map(d=>
+    `<div class="doccard" data-doc="${d.id}"><div class="t">${T(d.t)}</div>
+     <div class="meta">${T(d.type)} · ${d.chunks} ${T('块')} · <span class="storage">${d.store}</span></div></div>`).join('');
+  $$('#docList .doccard').forEach(c=>c.onclick=()=>openDoc(+c.dataset.doc));
+}
+let curDoc=1;
+function openDoc(id){curDoc=id;const d=DOCS.find(x=>x.id===id);
+  $$('#docList .doccard').forEach(c=>c.classList.toggle('sel',+c.dataset.doc===id));
+  $('#vaultDetail').innerHTML=`<div>
+    <div class="surface-head" style="padding:0 0 8px"><h1>${T(d.t)}</h1></div>
+    <div style="margin:4px 0 14px"><span class="chip">${T(d.type)}</span> <span class="chip celadon">${d.chunks} ${T('分块')}</span> <span class="chip gold">${d.store}</span></div>
+    ${d.body.map((b,i)=>`<div class="chunkpage"><span class="no">#${i}</span>${T(b)}</div>`).join('')}
+   </div>
+   <div class="relations">
+    <h4>${T('检索 score')}</h4>
+    <div class="card" style="padding:9px 11px;margin-bottom:12px"><div style="font-size:12px">dense+bm25</div><div class="score-bar"><div style="width:84%"></div></div></div>
+    <h4>${T('抽取三元组')}</h4>
+    ${d.triples.map(t=>`<div class="edge"><b>${T(t[0])}</b><span class="pred">${T(t[1])}</span><b>${T(t[2])}</b></div>`).join('')}
+    <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px;align-items:flex-start">
+      <button class="smallbtn" onclick="go('graph')">${T('在图谱中查看 →')}</button>
+      <button class="cw-entry" onclick="cwFrom('vault','${(''+d.t).replace(/'/g,'')}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="18" cy="9" r="2"/><path d="M14.5 20a4 4 0 0 1 6.5-3"/></svg>${T('展开为协同 →')}</button>
+    </div>
+   </div>`;
+}
+let vaultMode='list';
+function vaultView(v){vaultMode=v;
+  $('#vbList').classList.toggle('on',v==='list');$('#vbTime').classList.toggle('on',v==='timeline');
+  $('#vaultListMode').style.display=v==='list'?'grid':'none';
+  $('#vaultTimeMode').style.display=v==='timeline'?'block':'none';
+  $('#vaultViewHint').style.display=v==='timeline'?'inline-flex':'none';
+  if(v==='timeline')renderTimeline($('#vaultQ').value);
+}
+const MON_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function monthLabel(dt){return LANG==='en'?MON_EN[dt.getMonth()]:(dt.getMonth()===5?'六月':'七月');}
+function fmtDate(md){return LANG==='en'?`${MON_EN[md.getMonth()]} ${md.getDate()}`:`${md.getMonth()+1}月${md.getDate()}日`;}
+function renderTimeline(filter=''){const q=filter.toLowerCase();
+  const start=new Date('2026-06-16'),today=new Date('2026-06-27'),DAYW=33,PAD=16,TOTAL=34;
+  const x=d=>PAD+((new Date(d)-start)/864e5)*DAYW+DAYW/2;
+  const W=PAD*2+TOTAL*DAYW;
+  let days='',grid='',mons='';
+  for(let i=0;i<=TOTAL;i++){const dt=new Date(start.getTime()+i*864e5),px=PAD+i*DAYW+DAYW/2;
+    days+=`<span class="tl-day" style="left:${px}px">${dt.getDate()}</span>`;
+    grid+=`<div class="tl-grid" style="left:${px}px"></div>`;
+    if(i===0||dt.getDate()===1)mons+=`<span class="tl-mon" style="left:${PAD+i*DAYW}px">${monthLabel(dt)}</span>`;
+  }
+  const tx=x('2026-06-27');
+  const rows=DOCS.filter(d=>!q||d.t.toLowerCase().includes(q)||T(d.t).toLowerCase().includes(q)).sort((a,b)=>new Date(b.date)-new Date(a.date)).map(d=>{
+    const ic=TLICON[d.icon]||TLICON.report,cls=TAGCLS[d.tag]||'',md=new Date(d.date);
+    return `<div class="tl-row"><div class="tl-card" style="left:${Math.round(x(d.date))}px" onclick="vaultView('list');openDoc(${d.id})" title="${T(d.t)}">
+      <span class="tl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></span>
+      <span class="tl-title">${T(d.t)}</span><span class="tl-d">${fmtDate(md)}</span>
+      <span class="chip ${cls}">${T(d.tag)}</span></div></div>`;}).join('');
+  $('#vaultTimeMode').innerHTML=`<div class="tl-inner" style="min-width:${W}px">${grid}
+    <div class="tl-today" style="left:${tx}px"></div><div class="tl-todaydot" style="left:${tx}px">27</div>
+    <div class="tl-axis">${mons}${days}</div><div class="tl-rows">${rows}</div></div>`;
+}
+$('#vaultQ').addEventListener('input',e=>{renderDocs(e.target.value);if(vaultMode==='timeline')renderTimeline(e.target.value);});
+
+/* ============ COWORK · 与同事协同 [前台] + 智能体工作台 [后台] ============ */
+let coworkRunning=false, cwHasRun=false;
+let cwSteps=0,cwTools=0,cwEgress=0,cwDenied=0;
+/* 前台参与者:同事(人类) + 墨子助手(AI) */
+const CW_MATES={
+  you: {nm:'你',     sub:'',     c:'var(--celadon-ink)', t:'me'},
+  lin: {nm:'林青',   sub:'产品',  c:'var(--graph-node-5)',t:'human',pres:'online'},
+  shen:{nm:'沈舟',   sub:'工程',  c:'var(--graph-node-7)',t:'human',pres:'online'},
+  zhou:{nm:'周遥',   sub:'设计',  c:'var(--graph-node-6)',t:'human',pres:'idle'},
+  asst:{nm:'墨子助手',sub:'AI 助手',c:'var(--celadon)',   t:'ai',pres:'online'}
+};
+const CW_MATE_ORDER=['lin','shen','zhou','asst'];
+/* 后台智能体(仅工作台内呈现) */
+const CW_AGENTS={
+  uma:  {nm:'UMA 路由', gl:'route',c:'var(--graph-node-1)'},
+  retr: {nm:'检索员',   gl:'vault',c:'var(--graph-node-7)'},
+  scout:{nm:'联网侦察', gl:'globe',c:'var(--graph-node-4)'},
+  synth:{nm:'综合员',   gl:'pen',  c:'var(--graph-node-5)'},
+  coder:{nm:'编码员',   gl:'code', c:'var(--graph-node-3)'}
+};
+const CW_AV_IC={
+  user:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+  route:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 9h6v6H9zM2 10h2M2 14h2M20 10h2M20 14h2M10 2v2M14 2v2M10 20v2M14 20v2"/>',
+  vault:'<path d="M4 4h12l4 4v12H4z"/><path d="M9 9h6M9 13h6M9 17h3"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+  pen:'<path d="M14 4l6 6L7 23l-6 1 1-6z"/><path d="M12.5 5.5l6 6"/>',
+  code:'<path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13 7l-2 10"/>',
+  ai:'<path d="M12 3l1.6 4.6L18 9l-4.4 1.4L12 15l-1.6-4.6L6 9l4.4-1.4z"/>'
+};
+const CW_TEAM_ORDER=['uma','retr','scout','synth','coder'];
+const CW_PRES_LBL={online:'在线',working:'工作中',done:'已完成',idle:'离开'};
+let cwPresence={uma:'idle',retr:'idle',scout:'idle',synth:'idle',coder:'idle'};
+function cwActor(id){return CW_MATES[id]||CW_AGENTS[id];}
+function cwAv(id,size){const a=cwActor(id);if(!a)return '';
+  if(a.t==='me'||a.t==='human'){return `<span class="cw-av ${size} cw-av-h" style="background:${a.c}">${T(a.nm).slice(0,1)}</span>`;}
+  const ic=a.t==='ai'?CW_AV_IC.ai:CW_AV_IC[a.gl];
+  return `<span class="cw-av ${size}${a.t==='ai'?' cw-av-ai':''}" style="background:${a.c}"><svg viewBox="0 0 24 24" fill="${a.t==='ai'?'currentColor':'none'}" stroke="${a.t==='ai'?'none':'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></span>`;}
+function renderColleagues(){
+  const on=CW_MATE_ORDER.filter(id=>(CW_MATES[id].pres||'online')==='online').length+1;
+  if($('#cwTeamSum'))$('#cwTeamSum').textContent=on+' '+T('在线');
+  const box=$('#cwMates');if(!box)return;
+  box.innerHTML=['you'].concat(CW_MATE_ORDER).map(id=>{const a=CW_MATES[id];const pres=id==='you'?'online':(a.pres||'online');
+    const av=a.t==='ai'?`<span class="cw-av lg cw-av-ai" style="background:${a.c}"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none">${CW_AV_IC.ai}</svg><span class="pdot ${pres}"></span></span>`:`<span class="cw-av lg cw-av-h" style="background:${a.c}">${T(a.nm).slice(0,1)}<span class="pdot ${pres}"></span></span>`;
+    return `<div class="cw-mate">${av}<div class="cw-mate-tx"><div class="nm">${T(a.nm)}${a.t==='ai'?' <span class="cw-aitag">AI</span>':''}</div><div class="st">${a.sub?T(a.sub)+' · ':''}${T(CW_PRES_LBL[pres])}</div></div></div>`;}).join('');
+}
+function renderMembers(){if($('#cwMembers'))$('#cwMembers').innerHTML=['you'].concat(CW_MATE_ORDER).map(id=>cwAv(id,'sm')).join('');}
+function renderAgents(){const box=$('#cwAgents');if(!box)return;
+  box.innerHTML=CW_TEAM_ORDER.map(id=>{const a=CW_AGENTS[id],st=cwPresence[id]||'idle';
+    return `<div class="cw-mate"><span class="cw-av md" style="background:${a.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${CW_AV_IC[a.gl]}</svg><span class="pdot ${st}"></span></span><div class="cw-mate-tx"><div class="nm">${T(a.nm)}</div><div class="st">${T(CW_PRES_LBL[st])}</div></div></div>`;}).join('');
+}
+function setPresence(id,st){cwPresence[id]=st;renderAgents();}
+/* 频道 */
+const CW_SESSIONS=[
+  {id:'s1',nm:'出网审计合规说明',active:true,rd:true},
+  {id:'s2',nm:'前端蓝图 · 五表面评审'},
+  {id:'s3',nm:'豆包接入 · 上线排期'},
+  {id:'s4',nm:'设计系统 v2.1 走查'}
+];
+function renderSessions(){
+  $('#cwSessions').innerHTML=CW_SESSIONS.map(s=>`<div class="cw-sess${s.active?' active':''}" data-sess="${s.id}"><span class="hash">#</span><span class="nm">${T(s.nm)}</span>${s.rd?'<span class="rd"></span>':''}</div>`).join('');
+  $$('#cwSessions .cw-sess').forEach(el=>el.onclick=()=>{
+    CW_SESSIONS.forEach(s=>s.active=(s.id===el.dataset.sess));renderSessions();
+    const s=CW_SESSIONS.find(x=>x.active);$('#cwChanName').textContent=T(s.nm);
+    if(s.id!=='s1')toast(T('演示频道 · 切回 #出网审计合规说明 可运行'));});
+}
+/* 任务看板(工作台内) */
+let CW_PLAN=[];
+function freshPlan(){return[
+  {id:'p1',t:'检索本地 Vault',st:'todo'},{id:'p2',t:'联网佐证(经门)',st:'todo'},
+  {id:'p3',t:'交叉复核',st:'todo'},{id:'p4',t:'综合归档',st:'todo'},{id:'p5',t:'生成补丁(编码员)',st:'todo'}];}
+const CW_PLAN_IC={todo:'<circle cx="12" cy="12" r="8"/>',doing:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/>',done:'<path d="M20 6L9 17l-5-5"/>',blocked:'<path d="M6 6l12 12M18 6L6 18"/>',skipped:'<path d="M5 12h14"/>'};
+function renderPlan(){if(!$('#cwPlan'))return;$('#cwPlan').innerHTML=CW_PLAN.map(p=>`<span class="cw-pcard ${p.st}"><span class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${CW_PLAN_IC[p.st]}</svg></span>${T(p.t)}</span>`).join('');}
+function setPlan(id,st){const p=CW_PLAN.find(x=>x.id===id);if(p){p.st=st;renderPlan();}}
+/* 流构建辅助:前台 #cwStream / 后台 #cwAgentStream */
+const cwStreamEl=()=>$('#cwStream');
+const cwAgentEl=()=>$('#cwAgentStream');
+function cwScroll(box){box=box||cwStreamEl();if(box)box.scrollTop=box.scrollHeight;}
+function nowHM(){const d=new Date();return (''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}
+function atChip(id){return `<span class="cw-at">@${T(cwActor(id).nm)}</span>`;}
+function cwSeedHuman(){const s=cwStreamEl();if(!s)return;s.innerHTML='';
+  cwMsg('lin',null,T('cw.h.lin1'));
+  const bd=cwMsg('shen',null,T('cw.h.shen1'));addReactions(bd,[{e:'👍',n:1}]);}
+function cwMsg(id,kind,html,roleTag,box){box=box||cwStreamEl();const a=cwActor(id)||{nm:id,c:'var(--ink)'};const el=document.createElement('div');el.className='cw-msg'+(kind?' '+kind:'');
+  const role=(a.sub&&a.t&&a.t!=='me')?`<span class="cw-role">${T(a.sub)}</span>`:'';
+  el.innerHTML=`${cwAv(id,'md')}<div class="cw-bd"><div class="cw-hd"><span class="cw-nm" style="color:${id==='you'?'var(--ink)':a.c}">${T(a.nm)}</span>${role}${roleTag?`<span class="cw-role">${roleTag}</span>`:''}<span class="cw-tm">${nowHM()}</span></div><div class="cw-tx">${html}</div></div>`;
+  box.appendChild(el);cwScroll(box);return el.querySelector('.cw-bd');}
+function cwSys(html,box){box=box||cwStreamEl();const el=document.createElement('div');el.className='cw-sys';el.innerHTML=html;box.appendChild(el);cwScroll(box);}
+function cwTyping(id,box){box=box||cwStreamEl();const el=document.createElement('div');el.className='cw-typing';el.innerHTML=`${cwAv(id,'md')}<div class="dots"><i></i><i></i><i></i></div>`;box.appendChild(el);cwScroll(box);}
+function cwClearTyping(box){box=box||cwStreamEl();const t=[...box.querySelectorAll('.cw-typing')].pop();if(t)t.remove();}
+function cwToolCard(bd,tool,arg){const c=document.createElement('div');c.className='cw-tool pending';c.innerHTML=`<div class="cw-tool-h"><span class="pulse"></span><span class="tnm">${tool}</span><span class="targ">("${arg}")</span></div>`;bd.appendChild(c);return c;}
+function cwToolResolve(card,resHTML){card.classList.remove('pending');const hh=card.querySelector('.cw-tool-h');const p=hh.querySelector('.pulse');if(p)p.remove();hh.insertAdjacentHTML('beforeend','<span class="tok">✓</span>');const b=document.createElement('div');b.className='cw-tool-b';b.innerHTML=resHTML;card.appendChild(b);}
+function cwHITL(bd,title,body,onOk,onNo){const c=document.createElement('div');c.className='cw-hitl';
+  c.innerHTML=`<div class="hh">⏸ ${T('待确认 HITL')} · ${title}</div><div class="hb">${body}</div><div class="ha"><button class="hbtn ok">${T('批准出网')}</button><button class="hbtn no">${T('拒绝')}</button></div><div class="hres"></div>`;
+  bd.appendChild(c);cwScroll(cwStreamEl());
+  const ok=c.querySelector('.hbtn.ok'),no=c.querySelector('.hbtn.no'),res=c.querySelector('.hres');
+  ok.onclick=()=>{if(c.classList.contains('resolved'))return;c.classList.add('resolved');res.innerHTML=`<span style="color:var(--celadon-ink)">✓ ${T('你已批准')}</span>`;onOk();};
+  no.onclick=()=>{if(c.classList.contains('resolved'))return;c.classList.add('resolved');res.innerHTML=`<span style="color:var(--cinnabar)">✕ ${T('你已拒绝')}</span>`;onNo();};}
+function cwSeal(bd,html){const s=document.createElement('div');s.className='cw-seal';s.innerHTML=`<span class="si">✕</span><span>${html}</span>`;bd.appendChild(s);}
+function addReactions(bd,list){const r=document.createElement('div');r.className='cw-react';
+  r.innerHTML=list.map(x=>`<span class="cw-rx${x.on?' on':''}"><span class="e">${x.e}</span> <span class="n">${x.n}</span></span>`).join('')+`<span class="cw-rx add" title="${T('添加反应')}">＋</span>`;
+  bd.appendChild(r);
+  r.querySelectorAll('.cw-rx:not(.add)').forEach(c=>c.onclick=()=>{const on=c.classList.toggle('on');const n=c.querySelector('.n');n.textContent=(+n.textContent)+(on?1:-1);});
+  r.querySelector('.add').onclick=()=>toast(T('反应已记录(演示)'));}
+function addThread(bd,agents,label,rows){const t=document.createElement('div');t.className='cw-thread';
+  t.innerHTML=`<span class="cw-thread-tog"><span class="cw-tav">${agents.map(a=>cwAv(a,'sm')).join('')}</span>${rows.length} ${T('条细节')} · ${label}</span><div class="cw-thread-body">${rows.map(rw=>`<div class="cw-thread-msg"><span class="rt">${rw.rt}</span>${rw.tx}</div>`).join('')}</div>`;
+  bd.appendChild(t);t.querySelector('.cw-thread-tog').onclick=()=>t.classList.toggle('open');}
+/* 回执(工作台内) */
+function cwReceipt(){if($('#rcSteps'))$('#rcSteps').textContent=cwSteps;if($('#rcTools'))$('#rcTools').textContent=cwTools;if($('#rcEgress'))$('#rcEgress').textContent=cwEgress;if($('#rcCost'))$('#rcCost').textContent='¥'+(cwSteps*0.004).toFixed(3);}
+function cwBump(){cwSteps++;cwReceipt();}
+function cwAuditAllow(){$('#rcAudit').innerHTML=`<span style="color:var(--celadon-ink)">${cwEgress} ${T('egr.allow')}</span>${T('egr.allowtail')}`;}
+function cwAuditDeny(){$('#rcAudit').innerHTML=`<span style="color:var(--celadon-ink)">${cwEgress} ${T('egr.allow')}</span> · <span style="color:var(--cinnabar)">${cwDenied} ${T('egr.deny')}</span>${T('egr.denytail')}`;}
+function cwSeq(steps,done){let i=0;const tick=()=>{if(i>=steps.length){done&&done();return;}const s=steps[i++];setTimeout(()=>{s.fn();tick();},s.ms);};tick();}
+function openInspector(){const x=$('#cwInspector');if(x)x.hidden=false;}
+function closeInspector(){const x=$('#cwInspector');if(x)x.hidden=true;}
+/* —— 运行:前台助手接单 + 后台 agent observe→act —— */
+function runCowork(taskText){
+  if(coworkRunning)return;coworkRunning=true;cwHasRun=true;
+  const btn=$('#coworkRun');btn.textContent=T('处理中…');btn.classList.add('stop');
+  const mdl=MODELS.find(m=>m.id===resolveModel());const sov=privacy==='sovereign';
+  if($('#cwModel'))$('#cwModel').textContent=mdl.name;
+  $('#rcModel').textContent=mdl.name;cwSteps=cwTools=cwEgress=cwDenied=0;cwReceipt();
+  $('#rcAudit').innerHTML=T('每步穿 egress 出网门 / allowed-tools 沙箱 / 配额硬上限。');
+  $('#cwArtifactSec').style.display='none';
+  cwAgentEl().innerHTML='';CW_PLAN=freshPlan();renderPlan();
+  cwPresence={uma:'online',retr:'idle',scout:'idle',synth:'idle',coder:'idle'};renderAgents();
+  cwLinks=[];renderLinks();
+  cwSeedHuman();
+  const task=(typeof taskText==='string'&&taskText.trim())?taskText.trim():((($('#cwInput').value||'').trim())||T('cw.h.you1'));
+  $('#cwInput').value='';$('#cwInput').style.height='auto';
+  cwMsg('you','user',task);
+  cwMsg('asst',null,T('cw.asst.take')+` <a class="cw-insp-link" onclick="openInspector()">${T('查看智能体协同过程 ▸')}</a>`);
+  const G=cwAgentEl();let searchBd=null,scoutBd=null;
+  cwSeq([
+    {ms:300,fn:()=>{setPresence('uma','working');cwTyping('uma',G);}},
+    {ms:800,fn:()=>{cwClearTyping(G);cwMsg('uma','reason',T('cw.uma.assign').replace('{r}',atChip('retr')).replace('{s}',atChip('scout')).replace('{y}',atChip('synth')),null,G);setPresence('uma','online');setPresence('retr','working');setPlan('p1','doing');cwBump();}},
+    {ms:600,fn:()=>cwTyping('retr',G)},
+    {ms:700,fn:()=>{cwClearTyping(G);searchBd=cwMsg('retr',null,T('cw.retr.start'),null,G);searchBd._card=cwToolCard(searchBd,'vault_search','出网审计');cwTools++;cwReceipt();cwScroll(G);}},
+    {ms:950,fn:()=>{cwToolResolve(searchBd._card,`<div class="cw-hit" onclick="openPeek('vault',2)"><span class="h-t">${T('出网审计机制')}</span><span class="h-s">dense+bm25 · 0.88</span></div><div class="cw-badge-inject">⊕ ${T('已注入 2 处来源 · provenance')}</div>`);cwScroll(G);cwLinkAdd('vault',2,T('出网审计机制'));cwLinkAdd('graph','agent_loop','agent_loop');setPlan('p1','done');setPresence('retr','done');cwBump();}},
+    {ms:700,fn:()=>{cwMsg('retr','reason',T('cw.retr.handoff').replace('{s}',atChip('scout')).replace('{y}',atChip('synth')),null,G);setPresence('scout','working');setPlan('p2','doing');}},
+    {ms:700,fn:()=>{cwMsg('scout','reason',T('cw.scout.need'),null,G);const bd=cwMsg('asst',null,T('cw.asst.hitl'));cwHITL(bd,T('出网请求 · egress'),T('cw.scout.hitlbody'),scoutApprove,scoutDeny);}}
+  ]);
+  function scoutApprove(){cwSeq([
+    {ms:200,fn:()=>{setPresence('scout','working');cwTyping('scout',G);}},
+    {ms:850,fn:()=>{cwClearTyping(G);scoutBd=cwMsg('scout',null,T('cw.scout.go'),null,G);scoutBd._card=cwToolCard(scoutBd,'web_search',T('信创 egress 数据主权'));cwTools++;cwReceipt();cwScroll(G);}},
+    {ms:950,fn:()=>{cwToolResolve(scoutBd._card,`<span class="ok">✓ ${T('3 条联网结果 · web_search 经 egress 门审计·放行 (国产白名单)')}</span>`);cwScroll(G);cwEgress++;cwReceipt();cwAuditAllow();setPlan('p2','done');setPresence('scout','done');}}
+  ],crosscheck);}
+  function scoutDeny(){cwSeq([{ms:200,fn:()=>{cwSys(T('cw.scout.denied'),G);setPlan('p2','skipped');setPresence('scout','idle');}}],crosscheck);}
+  function crosscheck(){
+    if(sov){setPlan('p3','doing');cwSeq([
+      {ms:500,fn:()=>{setPresence('uma','working');cwTyping('uma',G);}},
+      {ms:800,fn:()=>{cwClearTyping(G);const bd=cwMsg('uma','reason',T('cw.uma.cross'),null,G);cwSeal(bd,T('✕ 出网被拒 · provider=anthropic · 主权模式禁止非国产 provider 出网 (零字节出网)'));cwScroll(G);cwDenied++;cwAuditDeny();setPlan('p3','blocked');setPresence('uma','online');}},
+      {ms:650,fn:()=>cwMsg('uma','reason',T('cw.uma.fallback').replace('{y}',atChip('synth')),null,G)}
+    ],synth);}
+    else{cwSeq([{ms:500,fn:()=>{cwMsg('uma','reason',T('cw.uma.localok').replace('{y}',atChip('synth')),null,G);setPlan('p3','done');}}],synth);}
+  }
+  function synth(){setPresence('synth','working');setPlan('p4','doing');cwSeq([
+    {ms:450,fn:()=>cwTyping('synth',G)},
+    {ms:950,fn:()=>{cwClearTyping(G);cwMsg('synth',null,T('cw.synth.done'),null,G);setPlan('p4','done');setPresence('synth','done');cwBump();}},
+    {ms:600,fn:()=>{cwMsg('synth','reason',T('cw.synth.tocoder').replace('{c}',atChip('coder')),null,G);setPresence('coder','working');setPlan('p5','doing');}},
+    {ms:500,fn:()=>cwTyping('coder',G)},
+    {ms:950,fn:()=>{cwClearTyping(G);cwMsg('coder',null,T('cw.coder.done'),null,G);setPlan('p5','done');setPresence('coder','done');cwTools++;cwBump();cwLinkAdd('code','test_egress_gate.py','tests/test_egress_gate.py');}}
+  ],deliver);}
+  function deliver(){
+    const bd=cwMsg('asst',null,T('cowork.out.head')+T(cwDenied?'cowork.out.deny':'cowork.out.ok'));
+    bd.insertAdjacentHTML('beforeend',`<div class="cw-hit" onclick="openPeek('vault',2)"><span class="h-t">${T('出网审计机制')}</span><span class="h-s">dense+bm25 · 0.88</span></div><div style="margin-top:8px;font-size:var(--fs-meta);color:var(--ink-3)">${T('关联实体')} ${cwEnt('agent_loop')} ${cwEnt('egress 出网门')}</div>`);
+    cwDiffCard(bd,'tests/test_egress_gate.py');
+    addThread(bd,['retr','scout'],T('查看引用'),[{rt:'src1',tx:T('出网审计机制 · chunk_1 (本地)')},{rt:'src2',tx:cwDenied?T('本地 Vault · 综合(海外被拒)'):T('web · 信创 egress 数据主权(已审计)')}]);
+    addReactions(bd,[{e:'👍',n:2},{e:'✅',n:1}]);
+    bd.insertAdjacentHTML('beforeend',`<div style="margin-top:8px"><a class="cw-insp-link" onclick="openInspector()">${T('查看智能体协同过程')} · ${cwSteps} ${T('步')} ▸</a></div>`);
+    $('#cwArtifactSec').style.display='block';$('#coworkOut').innerHTML=T('cowork.out.head')+T(cwDenied?'cowork.out.deny':'cowork.out.ok');
+    cwLinkAdd('vault',2,T('出网审计机制'));
+    setTimeout(()=>{const lb=cwMsg('lin',null,T('cw.h.lin2'));addReactions(lb,[{e:'🙏',n:1}]);finishCowork();},700);
+  }
+  function finishCowork(){coworkRunning=false;const b=$('#coworkRun');b.textContent=T('交给助手');b.classList.remove('stop');}
+}
+/* —— composer / 侧栏 交互 —— */
+function cwSendHuman(){const inp=$('#cwInput');const v=(inp.value||'').trim();if(!v){runCowork();return;}
+  if(/(墨子助手|助手|assistant|asst)/i.test(v)){runCowork(v);return;}
+  cwMsg('you','user',v);inp.value='';inp.style.height='auto';
+  setTimeout(()=>cwMsg('lin',null,T('cw.h.ack')),700);}
+function bindCowork(){
+  const inp=$('#cwInput');if(!inp)return;
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();cwSendHuman();}});
+  inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,120)+'px';});
+  if($('#cwAt'))$('#cwAt').onclick=()=>{inp.value+='@墨子助手 ';inp.focus();};
+  if($('#cwAttach'))$('#cwAttach').onclick=()=>toast(T('本地附件 · 信创沙箱(演示)'));
+  if($('#cwNewBtn'))$('#cwNewBtn').onclick=()=>toast(T('新频道(演示)'));
+}
+function cwInit(){CW_PLAN=freshPlan();renderColleagues();renderAgents();renderSessions();renderMembers();renderPlan();renderLinks();cwReceipt();cwSeedHuman();bindCowork();}
+function cwRelang(){renderColleagues();renderAgents();renderSessions();renderMembers();renderPlan();renderLinks();if(!cwHasRun)cwSeedHuman();}
+
+/* ============ COWORK × 库/图/码 打通 (溯源·peek·写回·关联·入口) ============ */
+/* 流内实体 chip → peek 图谱 */
+function cwEnt(id){const n=(typeof nodes!=='undefined'&&nodes)?nodes.find(x=>x.id===id):null;const ti=n?TYPES[n.type]:1;
+  return `<span class="cw-ent" onclick="openPeek('graph','${id}')"><span class="d" style="background:var(--graph-node-${ti})"></span>${T(id)}</span>`;}
+/* diff 迷你卡 → peek 编码 */
+function cwDiffCard(bd,file){const c=document.createElement('div');c.className='cw-diff';c.onclick=()=>openPeek('code',file);
+  c.innerHTML=`<div class="d-h"><span>${file}</span><span class="d-x">+3 −0 · ${T('点击预览/应用')}</span></div>`+
+    `<pre><span class="add">+ def test_every_step_passes_egress_gate():</span>\n<span class="add">+     for s in agent_loop.run(goal):</span>\n<span class="add">+         assert s.egress_checked is True</span></pre>`;
+  bd.appendChild(c);cwScroll();}
+/* —— 关联 账本 —— */
+let cwLinks=[];
+const CW_LINK_IC={vault:'vault',graph:'graph',code:'code'};
+const CW_LINK_C={vault:'var(--graph-node-7)',graph:'var(--graph-node-1)',code:'var(--graph-node-3)'};
+const CW_LINK_KIND={vault:'知识库',graph:'图谱',code:'编码'};
+function cwLinkAdd(kind,id,label){
+  if(cwLinks.some(l=>l.kind===kind&&l.id===id))return;
+  cwLinks.push({kind,id,label});renderLinks();
+}
+function renderLinks(){const box=$('#cwLinks');if(!box)return;
+  if(!cwLinks.length){box.innerHTML=`<div class="muted" style="font-size:11.5px">${T('cw.links.empty')}</div>`;return;}
+  box.innerHTML=cwLinks.map((l,i)=>`<div class="cw-link" data-i="${i}">
+    <span class="lk-ic" style="background:${CW_LINK_C[l.kind]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[CW_LINK_IC[l.kind]]}</svg></span>
+    <span class="lk-tx"><div class="lk-t">${T(l.label)}</div><div class="lk-s">${T(CW_LINK_KIND[l.kind])} · ${l.id}</div></span></div>`).join('');
+  $$('#cwLinks .cw-link').forEach(el=>el.onclick=()=>{const l=cwLinks[+el.dataset.i];openPeek(l.kind,l.id);});
+}
+/* —— peek 抽屉 —— */
+function openPeek(kind,id){
+  const t=$('#cwPeekTitle'),b=$('#cwPeekBody'),btn=$('#cwPeekOpen');
+  if(kind==='vault'){const d=DOCS.find(x=>x.id===id)||DOCS[0];
+    t.textContent=T(d.t);
+    b.innerHTML=`<div class="cw-peek-kind"><span class="d" style="background:var(--graph-node-7)"></span>${T('知识库')} · ${d.store} · ${d.chunks} ${T('分块')}</div>`+
+      d.body.slice(0,3).map((x,i)=>`<div class="cw-peek-chunk"><span style="font-family:var(--font-mono);color:var(--ink-3);font-size:11px">#${i}</span> ${T(x)}</div>`).join('')+
+      `<div style="font-size:12px;color:var(--ink-3);margin:8px 0 4px">${T('抽取三元组')}</div>`+
+      d.triples.map(tr=>`<div class="cw-peek-tri"><b>${T(tr[0])}</b><span class="pr">${T(tr[1])}</span><b>${T(tr[2])}</b></div>`).join('');
+    btn.onclick=()=>{closePeek();go('vault');vaultView('list');openDoc(d.id);};
+  }else if(kind==='graph'){const n=nodes.find(x=>x.id===id)||nodes[0];
+    t.textContent=T(n.id);
+    const adjs=adj[n.id]||[];
+    b.innerHTML=`<div class="cw-peek-kind"><span class="d" style="background:var(--graph-node-${TYPES[n.type]})"></span>${T('图谱')} · ${T(n.type)} · degree ${n.deg}</div>`+
+      `<div style="font-size:12px;color:var(--ink-3);margin-bottom:4px">${T('邻接关系')}</div>`+
+      (adjs.length?adjs.map(a=>`<div class="cw-peek-tri"><b>${T(n.id)}</b><span class="pr">${T(a.p)}</span><b>${T(a.n.id)}</b></div>`).join(''):`<div class="muted" style="font-size:12px">—</div>`);
+    btn.onclick=()=>{closePeek();go('graph');setTimeout(()=>{const nn=nodes.find(x=>x.id===n.id);if(nn)selectNode(nn);},80);};
+  }else{
+    t.textContent=id;
+    b.innerHTML=`<div class="cw-peek-kind"><span class="d" style="background:var(--graph-node-3)"></span>${T('编码')} · diff · +3 −0</div>`+
+      `<div class="cw-diff" style="cursor:default"><div class="d-h"><span>${id}</span></div><pre><span class="add">+ def test_every_step_passes_egress_gate():</span>\n<span class="add">+     for s in agent_loop.run(goal):</span>\n<span class="add">+         assert s.egress_checked is True</span>\n<span style="color:var(--ink-3)">  # 每步过 egress 门 · 回归测试</span></pre></div>`;
+    btn.onclick=()=>{closePeek();go('code');setTimeout(runCode,180);};
+  }
+  $('#cwPeek').hidden=false;
+}
+function closePeek(){const p=$('#cwPeek');if(p)p.hidden=true;}
+/* —— 写回 + HITL 确认 (产物 → 库/图/码) —— */
+function cwWriteback(kind){
+  go('cowork');
+  const bd=cwMsg('synth','reason',T('cw.wb.'+kind+'.intro'));
+  cwHITL2(bd,T('cw.wb.'+kind+'.title'),T('cw.wb.'+kind+'.body'),()=>doWriteback(kind),()=>{});
+}
+/* HITL 变体: 确认/取消 (用于写回) */
+function cwHITL2(bd,title,body,onOk,onNo){
+  const c=document.createElement('div');c.className='cw-hitl';
+  c.innerHTML=`<div class="hh">⏸ ${T('待确认 HITL')} · ${title}</div><div class="hb">${body}</div>
+    <div class="ha"><button class="hbtn ok">${T('确认写回')}</button><button class="hbtn no">${T('取消')}</button></div><div class="hres"></div>`;
+  bd.appendChild(c);cwScroll();
+  const ok=c.querySelector('.hbtn.ok'),no=c.querySelector('.hbtn.no'),res=c.querySelector('.hres');
+  ok.onclick=()=>{if(c.classList.contains('resolved'))return;c.classList.add('resolved');res.innerHTML=`<span style="color:var(--celadon-ink)">✓ ${T('已写回')}</span>`;onOk();};
+  no.onclick=()=>{if(c.classList.contains('resolved'))return;c.classList.add('resolved');res.innerHTML=`<span style="color:var(--ink-3)">${T('已取消')}</span>`;onNo();};
+}
+function doWriteback(kind){
+  if(kind==='vault'){
+    const id=(Math.max(...DOCS.map(d=>d.id))+1);
+    DOCS.unshift({id,t:'出网审计机制 · 协同综合',type:'交付',chunks:3,store:'local',date:'2026-06-27',tag:'交付报告',icon:'ship',
+      body:[T('egress 唯一门审计每次外呼;主权模式非国产 provider 零字节出网。'),T('agent_loop 每步过 egress.classify 硬门并写 audit_log。'),T('多智能体协同综合 · 已注入 2 处本地来源。')],
+      triples:[['egress','审计','model.infer'],['sovereign','拒绝','非国产模型']]});
+    renderDocs($('#vaultQ')?$('#vaultQ').value:'');
+    cwLinkAdd('vault',id,'出网审计机制 · 协同综合');
+    cwSys(T('cw.wb.vault.done'));toast(T('已归档到知识库'));
+  }else if(kind==='graph'){
+    if(!RAW_NODES.some(n=>n.id==='egress')){
+      RAW_NODES.push({id:'egress',type:'概念'});
+      RAW_EDGES.push(['agent_loop','调用','egress'],['egress','审计','UMA网关']);
+      initGraph();spreaded=false;resizeGraph();
+      $('#graphCount').textContent=nodes.length+' '+T('实体')+' / '+edges.length+' '+T('关系');
+    }
+    cwLinkAdd('graph','egress','egress');
+    cwSys(T('cw.wb.graph.done'));toast(T('已回填图谱'));
+  }else{
+    cwLinkAdd('code','test_egress_gate.py','tests/test_egress_gate.py');
+    cwSys(T('cw.wb.code.done'));toast(T('补丁已应用(演示)'));
+    setTimeout(()=>{go('code');setTimeout(runCode,180);},500);
+  }
+}
+/* —— 反向入口: 各表面 → 发起/升级为协同 —— */
+function cwFrom(src,label){
+  go('cowork');coworkRunning=false;cwHasRun=true;
+  const map={vault:'知识库',graph:'图谱',code:'编码',chat:'对答'};
+  if(label){$('#cwChanName').textContent=T(label);$('#cwInput').value=T(label);}
+  CW_PLAN=freshPlan();renderPlan();
+  cwPresence={uma:'idle',retr:'idle',scout:'idle',synth:'idle',coder:'idle'};renderAgents();
+  cwLinks=[];renderLinks();
+  cwStreamEl().innerHTML='';cwAgentEl().innerHTML='';
+  cwSys(T('cw.from').replace('{s}',T(map[src])));
+  const bd=cwMsg('asst',null,T('cw.from.note').replace('{s}',T(map[src])));
+  bd.insertAdjacentHTML('beforeend',`<div class="cw-badge-inject" style="margin-top:7px">⊕ ${T('已注入来源 · 来自')}${T(map[src])}</div>`);
+  if(src==='vault'){cwLinkAdd('vault',curDoc||1,(DOCS.find(d=>d.id===(curDoc||1))||DOCS[0]).t);}
+  if(src==='graph'&&focusId){cwLinkAdd('graph',focusId,focusId);}
+  if(src==='code'){cwLinkAdd('code','lru_cache.py','lru_cache.py');}
+  const inp=$('#cwInput');if(inp)inp.focus();
+  toast(T('已发起协同 · 点运行'));
+}
+
+/* ============ CODE diff ============ */
+const DIFF=[
+  {k:' ',n:'1',h:'<span class="kw">from</span> functools <span class="kw">import</span> lru_cache'},
+  {k:'+',n:'2',h:'<span class="kw">import</span> threading'},
+  {k:' ',n:'3',h:''},
+  {k:'-',n:'4',h:'<span class="kw">class</span> <span class="fn">LRU</span>:'},
+  {k:'+',n:'4',h:'<span class="kw">class</span> <span class="fn">LRU</span>:  <span class="cm"># thread-safe</span>'},
+  {k:'+',n:'5',h:'    _lock = threading.<span class="fn">RLock</span>()'},
+  {k:' ',n:'6',h:'    <span class="kw">def</span> <span class="fn">get</span>(self, key):'},
+  {k:'-',n:'7',h:'        <span class="kw">return</span> self.cache.<span class="fn">get</span>(key)'},
+  {k:'+',n:'8',h:'        <span class="kw">with</span> self._lock:'},
+  {k:'+',n:'9',h:'            <span class="kw">return</span> self.cache.<span class="fn">get</span>(key)'}
+];
+const CODE_PROC=['reasoning · 读取选区上下文','tool_call · vault_search("线程安全 缓存")','tool_result · 命中 1 块','step · 生成新版本 → 行级 diff'];
+function runCode(){
+  const d=$('#codeDiff');d.innerHTML='';let i=0;
+  const proc=$('#codeProcess');proc.innerHTML='';
+  CODE_PROC.forEach((p,k)=>setTimeout(()=>{const e=document.createElement('div');e.className='step';e.style.paddingLeft='20px';
+    e.innerHTML=`<div class="dot" style="left:0"></div><div class="lab">${p.split(' · ')[0]}</div><div class="body" style="font-size:12px">${T(p.split(' · ')[1])}</div>`;proc.appendChild(e);},k*450));
+  const drawLine=()=>{if(i>=DIFF.length)return;const l=DIFF[i++];const cls=l.k==='+'?'add':l.k==='-'?'del':'';
+    const row=document.createElement('div');row.className='ln '+cls;
+    row.innerHTML=`<span class="no">${l.n}</span><span class="mk">${l.k}</span><span>${l.h||'&nbsp;'}</span>`;d.appendChild(row);setTimeout(drawLine,90);};
+  setTimeout(drawLine,CODE_PROC.length*450);
+}
+
+/* ============ COMMAND PALETTE ============ */
+const CMDS=[
+  ...SURFACES.map(([k,l])=>({g:'跳转表面',ic:k,t:'打开'+l,sub:'⌘'+(SURFACES.findIndex(s=>s[0]===k)+1),act:()=>go(k)})),
+  {g:'文档',ic:'vault',t:'墨子检索架构',sub:'vault',act:()=>{go('vault');openDoc(1)}},
+  {g:'文档',ic:'vault',t:'出网审计机制',sub:'vault',act:()=>{go('vault');openDoc(2)}},
+  {g:'实体',ic:'graph',t:'检索架构 (文档)',sub:'kg',act:()=>{go('graph');setTimeout(()=>selectNode(nodes.find(n=>n.id==='检索架构')),60)}},
+  {g:'实体',ic:'graph',t:'agent_loop',sub:'kg',act:()=>{go('graph');setTimeout(()=>selectNode(nodes.find(n=>n.id==='agent_loop')),60)}},
+  {g:'动作',ic:'cowork',t:'发起 Cowork 调研',sub:'run',act:()=>{go('cowork');setTimeout(runCowork,200)}},
+  {g:'动作',ic:'code',t:'生成代码 diff',sub:'run',act:()=>{go('code');setTimeout(runCode,200)}},
+  {g:'动作',ic:'cowork',t:'全链路打通',sub:'tour',act:()=>tourStart('all')},
+  {g:'动作',ic:'cowork',t:'知识闭环 · 库×图',sub:'tour',act:()=>tourStart('kb')},
+  {g:'动作',ic:'vault',t:'知识库 · 切时间轴视图',sub:'timeline',act:()=>{go('vault');vaultView('timeline')}},
+  {g:'模型',ic:'cowork',t:'模型 · 自动 (UMA)',sub:'model',act:()=>selectModel('auto')},
+  {g:'模型',ic:'cowork',t:'模型 · DeepSeek-V4-Pro',sub:'model',act:()=>selectModel('deepseek-v4-pro')},
+  {g:'模型',ic:'cowork',t:'模型 · doubao-seed-evolving',sub:'model',act:()=>selectModel('doubao-seed-evolving')}
+];
+let pCur=0,pFiltered=CMDS;
+function openPalette(){$('#scrim').classList.add('open');$('#paletteInput').value='';$('#paletteInput').focus();renderPalette('');}
+function closePalette(){$('#scrim').classList.remove('open');}
+function renderPalette(q){const lq=q.toLowerCase();
+  pFiltered=CMDS.filter(c=>c.t.toLowerCase().includes(lq)||T(c.t).toLowerCase().includes(lq));pCur=0;
+  const groups={};pFiltered.forEach(c=>{(groups[c.g]=groups[c.g]||[]).push(c)});
+  let html='',idx=0;
+  for(const g in groups){html+=`<div class="pgroup">${T(g)}</div>`;
+    groups[g].forEach(c=>{html+=`<div class="pitem" data-i="${idx}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${ICON[c.ic]}</svg></span>${T(c.t)}<span class="sub">${c.sub}</span></div>`;idx++;});}
+  $('#paletteResults').innerHTML=html||`<div class="pgroup">${T('无匹配')}</div>`;
+  $$('#paletteResults .pitem').forEach(it=>{it.onclick=()=>{pFiltered[+it.dataset.i].act();closePalette();}});
+  hi();
+}
+function hi(){$$('#paletteResults .pitem').forEach(it=>it.classList.toggle('cur',+it.dataset.i===pCur));}
+$('#paletteInput').addEventListener('input',e=>renderPalette(e.target.value));
+$('#paletteInput').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();pCur=Math.min(pCur+1,pFiltered.length-1);hi();$$('#paletteResults .pitem')[pCur]?.scrollIntoView({block:'nearest'});}
+  else if(e.key==='ArrowUp'){e.preventDefault();pCur=Math.max(pCur-1,0);hi();}
+  else if(e.key==='Enter'){e.preventDefault();pFiltered[pCur]?.act();closePalette();}
+  else if(e.key==='Escape')closePalette();
+});
+$('#cmdkBtn').onclick=openPalette;$('#scrim').onclick=e=>{if(e.target===$('#scrim'))closePalette();};
+addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();$('#scrim').classList.contains('open')?closePalette():openPalette();}
+  if((e.metaKey||e.ctrlKey)&&e.key>='1'&&e.key<='5'){e.preventDefault();go(SURFACES[+e.key-1][0]);}
+});
+
+/* ============ i18n apply ============ */
+function applyLang(){
+  document.documentElement.lang=LANG==='zh'?'zh-CN':LANG==='hant'?'zh-Hant':'en';
+  if($('#langLbl'))$('#langLbl').textContent={zh:'简体',hant:'繁體',en:'EN'}[LANG];
+  $$('#langMenu .mm-item').forEach(it=>it.classList.toggle('cur',it.dataset.lang===LANG));
+  $$('[data-i18n]').forEach(el=>el.innerHTML=T(el.getAttribute('data-i18n')));
+  $$('[data-i18n-ph]').forEach(el=>el.placeholder=T(el.getAttribute('data-i18n-ph')));
+  $$('[data-i18n-val]').forEach(el=>el.value=T(el.getAttribute('data-i18n-val')));
+  buildRail();renderLegend();
+  renderDocs($('#vaultQ').value);if(curDoc)openDoc(curDoc);
+  if(vaultMode==='timeline')renderTimeline($('#vaultQ').value);
+  const fn=nodes.find(x=>x.id===focusId);if(fn)selectNode(fn);
+  cwRelang();
+  updatePrivacyUI();updateModelUI();
+}
+function setLang(l){LANG=l;closeLangMenu();applyLang();}
+function toggleLangMenu(e){e.stopPropagation();$('#langMenu').classList.toggle('open');}
+function closeLangMenu(){const m=$('#langMenu');if(m)m.classList.remove('open');}
+addEventListener('click',e=>{if(!e.target.closest('#langBtn')&&!e.target.closest('#langMenu'))closeLangMenu();});
+/* 对答 底部输入 */
+function chatSend(){const i=$('#chatInput');if(!i)return;const v=(i.value||'').trim();if(!v)return;
+  const box=$('#chatMsgs');if(box)box.insertAdjacentHTML('beforeend',`<div class="msg user"><div class="role">user</div><div class="bubble"></div></div>`);
+  if(box)box.lastElementChild.querySelector('.bubble').textContent=v;
+  i.value='';i.style.height='auto';const sc=document.querySelector('.chat-scroll');if(sc)sc.scrollTop=sc.scrollHeight;
+  setTimeout(()=>{if(box)box.insertAdjacentHTML('beforeend',`<div class="msg bot"><div class="role">assistant · ${resolveModel()}</div><div class="bubble">${T('chat.echo')}</div></div>`);const s=document.querySelector('.chat-scroll');if(s)s.scrollTop=s.scrollHeight;},600);}
+function bindChat(){const i=$('#chatInput');if(!i)return;
+  i.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chatSend();}});
+  i.addEventListener('input',()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px';});}
+
+/* ============ 演示导览 Guided Tour (多脚本:全链路 / 知识闭环) ============ */
+let tourSteps=[],tourChecks=[],tourI=0,tourTimer=null,tourDone=[];
+function renderTourCheck(){const c=$('#tourCheck');if(!c)return;
+  c.innerHTML=tourChecks.map((k,i)=>`<span class="tour-ck${tourDone[i]?' on':''}"><span class="b">${tourDone[i]?'✓':(i+1)}</span>${T(k)}</span>`).join('');}
+function tourSpot(sel){const r=$('#tourRing');if(!r)return;
+  const el=typeof sel==='function'?sel():(sel?document.querySelector(sel):null);
+  if(!el||!el.getBoundingClientRect){r.hidden=true;return;}
+  const b=el.getBoundingClientRect();if(b.width<2||b.height<2){r.hidden=true;return;}
+  const pad=6;r.style.top=(b.top-pad)+'px';r.style.left=(b.left-pad)+'px';r.style.width=(b.width+pad*2)+'px';r.style.height=(b.height+pad*2)+'px';r.hidden=false;}
+function tourAutoApprove(){let n=0;const iv=setInterval(()=>{const b=document.querySelector('#cwStream .cw-hitl:not(.resolved) .hbtn.ok');if(b)b.click();if(++n>50||!coworkRunning)clearInterval(iv);},340);}
+function tourConfirmLast(){const a=$$('#cwStream .cw-hitl:not(.resolved) .hbtn.ok');if(a.length)a[a.length-1].click();}
+const tourLastHitl=()=>{const a=$$('#cwStream .cw-hitl');return a[a.length-1];};
+function tourScripts(which){
+  const all={checks:['tck.0','tck.1','tck.2','tck.3'],steps:[
+    {title:'tour.t0',body:'tour.b0',spot:()=>$('[data-go="cowork"]'),act:()=>go('cowork'),delay:2600},
+    {title:'tour.t1',body:'tour.b1',spot:()=>document.querySelector('.cw-inspector .cw-peek-panel'),tick:2,act:()=>{coworkRunning=false;runCowork();tourAutoApprove();openInspector();},waitFor:()=>!coworkRunning,hold:900},
+    {title:'tour.t2',body:'tour.b2',spot:()=>document.querySelector('#cwPeek .cw-peek-panel'),tick:0,act:()=>{closeInspector();openPeek('vault',2);setTimeout(()=>openPeek('graph','agent_loop'),1700);setTimeout(()=>openPeek('code','tests/test_egress_gate.py'),3400);},delay:5200},
+    {title:'tour.t3',body:'tour.b3',spot:tourLastHitl,tick:1,act:()=>{closePeek();$('#cwArtifactSec').style.display='block';cwWriteback('vault');setTimeout(tourConfirmLast,1700);},delay:4400},
+    {title:'tour.t4',body:'tour.b4',spot:'#cwLinks',tick:3,act:()=>go('cowork'),delay:3200},
+    {title:'tour.t5',body:'tour.b5',spot:()=>document.querySelector('#vaultDetail .cw-entry'),act:()=>{go('vault');vaultView('list');openDoc(2);},delay:3800},
+    {title:'tour.t6',body:'tour.b6',spot:null,act:()=>go('cowork'),auto:false}
+  ]};
+  const kb={checks:['kck.0','kck.1','kck.2','kck.3'],steps:[
+    {title:'kb.t0',body:'kb.b0',spot:()=>$('[data-go="cowork"]'),act:()=>go('cowork'),delay:2800},
+    {title:'kb.t1',body:'kb.b1',spot:()=>document.querySelector('.cw-inspector .cw-peek-panel'),act:()=>{coworkRunning=false;runCowork();tourAutoApprove();openInspector();},waitFor:()=>!coworkRunning,hold:900},
+    {title:'kb.t2',body:'kb.b2',spot:()=>document.querySelector('#cwPeek .cw-peek-panel'),tick:0,act:()=>{closeInspector();openPeek('vault',2);},delay:3600},
+    {title:'kb.t3',body:'kb.b3',spot:()=>document.querySelector('#cwPeek .cw-peek-panel'),tick:1,act:()=>openPeek('graph','agent_loop'),delay:3600},
+    {title:'kb.t4',body:'kb.b4',spot:tourLastHitl,tick:2,act:()=>{closePeek();$('#cwArtifactSec').style.display='block';cwWriteback('vault');setTimeout(tourConfirmLast,1700);},delay:4400},
+    {title:'kb.t5',body:'kb.b5',spot:tourLastHitl,tick:3,act:()=>{cwWriteback('graph');setTimeout(tourConfirmLast,1700);},delay:4400},
+    {title:'kb.t6',body:'kb.b6',spot:()=>document.querySelector('#docList .doccard'),act:()=>{go('vault');vaultView('list');},auto:false}
+  ]};
+  return which==='kb'?kb:all;
+}
+function tourRun(){
+  const s=tourSteps[tourI];if(!s)return;
+  $('#tourStep').textContent=(tourI+1)+'/'+tourSteps.length;
+  $('#tourTitle').textContent=T(s.title);$('#tourBody').innerHTML=T(s.body);
+  $('#tourNext').textContent=tourI===tourSteps.length-1?T('完成'):T('下一步');
+  $('#tourPrev').style.visibility=tourI===0?'hidden':'visible';
+  if(s.tick!=null)tourDone[s.tick]=true;
+  renderTourCheck();
+  if(s.act){try{s.act();}catch(e){}}
+  setTimeout(()=>tourSpot(s.spot),s.spotDelay||300);
+  if(s.auto!==false){let tries=0;
+    const adv=()=>{ if(s.waitFor){ if(s.waitFor()||tries>54)tourTimer=setTimeout(tourNext,s.hold||1200); else {tries++;tourTimer=setTimeout(adv,300);} }
+      else tourTimer=setTimeout(tourNext,s.delay||3000); };
+    adv();}
+}
+function tourStart(which){which=which||'all';closeTourMenu();clearTimeout(tourTimer);
+  const sc=tourScripts(which);tourChecks=sc.checks;tourSteps=sc.steps;tourDone=tourChecks.map(()=>false);tourI=0;
+  $('#tourPanel').hidden=false;tourRun();}
+function tourEnd(){clearTimeout(tourTimer);const p=$('#tourPanel'),r=$('#tourRing');if(p)p.hidden=true;if(r)r.hidden=true;closePeek();}
+function tourNext(){clearTimeout(tourTimer);if(tourI<tourSteps.length-1){tourI++;tourRun();}else tourEnd();}
+function tourPrev(){clearTimeout(tourTimer);if(tourI>0){tourI--;tourRun();}}
+function toggleTourMenu(e){e.stopPropagation();$('#tourMenu').classList.toggle('open');}
+function closeTourMenu(){const m=$('#tourMenu');if(m)m.classList.remove('open');}
+addEventListener('click',e=>{if(!e.target.closest('#tourBtn')&&!e.target.closest('#tourMenu'))closeTourMenu();});
+addEventListener('resize',()=>{if(tourSteps.length&&$('#tourPanel')&&!$('#tourPanel').hidden){const s=tourSteps[tourI];if(s)tourSpot(s.spot);}});
+
+/* ============ INIT ============ */
+readGraphColors();initGraph();renderDocs();openDoc(1);vaultView('timeline');
+updatePrivacyUI();updateModelUI();buildRail();cwInit();bindChat();
+new ResizeObserver(resizeGraph).observe(cv.parentElement);
+resizeGraph();selectNode(nodes[0]);loop();applyLang();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "routing.task_acc": 1.0,
+  "routing.policy_acc": 1.0,
+  "routing.model_acc": 1.0,
+  "routing.sovereign_ok": 1.0,
+  "retrieval.recall_at_k": 1.0,
+  "retrieval.mrr": 1.0,
+  "retrieval.inject_precision": 1.0,
+  "kg.precision": 1.0,
+  "kg.recall": 1.0,
+  "kg.f1": 1.0
+}

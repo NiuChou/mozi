@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+backend/.venv/
+backend/data/
+backend/*.egg-info/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Env & secrets (不入仓)
+.env
+.env.local
+*.db
+*.db-wal
+*.db-shm
+
+# OS / editor / tooling
+.DS_Store
+.omc/
+.claude/
+.ruff_cache/
+.pytest_cache/
+backend/data/
+backend/events.jsonl
+backend/.coverage
+.coverage
+backend/migration_backups/
+
+# 内部规划/策略文档 (不随开源公开: 路线图 / build-vs-buy / 专利锚点)
+docs/墨子-剩余开发计划*.md
+docs/墨子-技术复用矩阵.md
+docs/墨子-设计评审-*.md
+docs/墨子-前端蓝图-*.md

@@ -1,0 +1,9 @@
+# 路由 golden: req 直喂 RouteRequest(**req); expect 集合归属 (task_type/policy 确定性, models 仅确定处声明)
+{"id":"r_code_auto","req":{"policy":"auto","est_tokens":2000,"text":"```python\ndef f():\n    return 1\n```"},"expect":{"task_type":"code","policy":"code"}}
+{"id":"r_long_auto","req":{"policy":"auto","est_tokens":300000,"text":"超长文档摘要任务"},"expect":{"task_type":"long","policy":"long_context"}}
+{"id":"r_sovereign","req":{"policy":"auto","privacy_tier":"sovereign","text":"你好，介绍一下墨子"},"expect":{"task_type":"general","domestic_only":true}}
+{"id":"r_budget_flash","req":{"policy":"auto","budget_cny":0.005,"text":"简单问候"},"expect":{"task_type":"general","policy":"economy","models":["deepseek-v4-flash"]}}
+{"id":"r_economy_explicit","req":{"policy":"economy","text":"随便聊聊"},"expect":{"task_type":"general","policy":"economy"}}
+{"id":"r_quality_explicit","req":{"policy":"quality","text":"深入分析这个问题"},"expect":{"policy":"quality"}}
+{"id":"r_general_balanced","req":{"policy":"auto","text":"今天天气怎么样"},"expect":{"task_type":"general","policy":"balanced"}}
+{"id":"r_economy_auto_budget","req":{"policy":"auto","budget_cny":0.015,"text":"普通对话内容"},"expect":{"task_type":"general","policy":"economy"}}

@@ -1,0 +1,9 @@
+# 可选检索重依赖 (核心 requirements.txt 不含): 缺任一即 auto 降级 mock/bruteforce/内存 BM25, 零外呼可跑。
+# 装法: backend/.venv/bin/pip install -r backend/requirements-ml.txt
+onnxruntime>=1.17        # BGE-M3 ONNX int8 默认真实档 (_OnnxEmbedder, 无 torch, CPU/信创)
+tokenizers>=0.15         # ONNX 档分词
+numpy                    # 池化/向量运算 (可选加速)
+sentence-transformers>=3.0   # 高精度可选档 (_STEmbedder)
+sqlite-vec>=0.1.6,<0.2   # dense KNN vec0 虚表 (避开 0.2 破坏 MATCH 语义)
+# wangfenjin/simple FTS5 中文分词扩展为非 pip 包: 自行编译 .so 后配 MOZI_FTS_SIMPLE_PATH 指向
+# (见 docs/retrieval/fts-simple.md); 缺则降级 unicode61 + 应用层预切词。

@@ -1,0 +1,4 @@
+# 开发/CI 依赖 (不入运行时镜像)
+ruff>=0.6
+coverage>=7        # eval coverage 门禁 (router/retrieval/kg); 仅 CI/dev, 不入运行时
+# scikit-learn / pytrec_eval 仅作 eval 可选交叉校验, 缺则 skipUnless 跳过, 不写入此处 (守轻栈/信创)

@@ -1,0 +1,7 @@
+# KG golden: 换行锚定行首, 确切三元组 (regex 启发式抽取)
+{"id":"kg_basic","text":"墨子依赖 BGE-M3。\nUMA 是多模型路由网关。\nVault 使用 SQLite。","expect_triples":[["墨子","依赖","BGE-M3"],["UMA","是","多模型路由网关"],["Vault","使用","SQLite"]]}
+{"id":"kg_contains","text":"知识库包含文档。\n墨子有知识图谱。\n网关属于墨子。","expect_triples":[["知识库","包含","文档"],["墨子","有","知识图谱"],["网关","属于","墨子"]]}
+{"id":"kg_uses","text":"检索使用向量。\n墨子使用 SQLite。\n路由依赖策略。","expect_triples":[["检索","使用","向量"],["墨子","使用","SQLite"],["路由","依赖","策略"]]}
+{"id":"kg_en","text":"Mozi is a platform.\nVault uses SQLite.\nGateway has routing.","expect_triples":[["Mozi","is","platform"],["Vault","uses","SQLite"],["Gateway","has","routing"]]}
+{"id":"kg_mixed","text":"墨子是本地优先平台。\n检索使用 BGE-M3。\nKG 包含三元组。","expect_triples":[["墨子","是","本地优先平台"],["检索","使用","BGE-M3"],["KG","包含","三元组"]]}
+{"id":"kg_deps","text":"网关依赖适配器。\n适配器使用 httpx。\n墨子包含网关。","expect_triples":[["网关","依赖","适配器"],["适配器","使用","httpx"],["墨子","包含","网关"]]}

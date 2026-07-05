@@ -1,0 +1,8 @@
+{"a": "北京", "b": "首都北京", "same": true}
+{"a": "清华", "b": "清华大学", "same": true}
+{"a": "墨子", "b": "Mozi", "same": true}
+{"a": "苹果公司", "b": "苹果(水果)", "same": false}
+{"a": "Python", "b": "Python蛇", "same": false}
+{"a": "UMA 路由网关", "b": "UMA", "same": true}
+{"a": "BGE-M3", "b": "深度学习框架", "same": false}
+{"a": "SQLite", "b": "MySQL", "same": false}
