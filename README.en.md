@@ -17,8 +17,6 @@
 
 Mozi·Chat (frontend) + UMA multi-model routing gateway + Vault & Mozi-KG (backend) + SQLite. The core loop: **Chat — Route — Knowledge**. Missing keys fall back to a local mock automatically, so it runs end-to-end with zero egress; add any model key to switch to real streaming. A Tauri/Rust native shell is a packaging item — today the full API contract and data model are implemented with a **Python (FastAPI) backend + React/TS frontend + SQLite**.
 
-![Mozi·Chat](docs/screenshot.png)
-
 ---
 
 ## Features

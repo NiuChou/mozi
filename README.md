@@ -17,8 +17,6 @@
 
 墨子·Chat（前端）+ UMA 多模型路由网关 + Vault & Mozi-KG（后端）+ SQLite。核心闭环：**对话 — 路由 — 知识**。缺 key 自动走本地 mock，零外呼即可端到端跑通；配置任一模型 key 即切真实流式。Tauri/Rust 原生外壳为打包项，当前以 **Python（FastAPI）后端 + React/TS 前端 + SQLite** 实现全部接口契约与数据模型。
 
-![墨子·Chat](docs/screenshot.png)
-
 ---
 
 ## 特性
