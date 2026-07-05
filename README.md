@@ -1,6 +1,6 @@
 <div align="center">
 
-# 墨子 · Mozi
+<h1><img src="docs/logo.svg" width="44" height="44" align="middle" alt="墨子 Mozi" />&nbsp; 墨子 · Mozi</h1>
 
 **本地优先的桌面 AI 平台** — 一座网关统一多模型路由，一座 Vault 沉淀你的知识，全程零 key、零外呼即可端到端运行。
 

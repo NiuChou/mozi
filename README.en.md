@@ -1,6 +1,6 @@
 <div align="center">
 
-# 墨子 · Mozi
+<h1><img src="docs/logo.svg" width="44" height="44" align="middle" alt="墨子 Mozi" />&nbsp; 墨子 · Mozi</h1>
 
 **A local-first desktop AI platform** — one gateway to unify multi-model routing, one Vault to accumulate your knowledge, runnable end-to-end with zero API keys and zero network egress.
 
